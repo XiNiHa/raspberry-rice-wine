@@ -2,6 +2,7 @@
 
 import { app, protocol, BrowserWindow } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
+import installExtension from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -60,7 +61,17 @@ app.on('activate', () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', () => createWindow())
+app.on('ready', async () => {
+  if (isDevelopment && !process.env.IS_TEST) {
+    // Install Vue Devtools
+    try {
+      await installExtension('ljjemllljcmogpfapbkkighbhhppjdbg') // VueJS Devtools Beta Channel
+    } catch (e) {
+      console.error('Vue Devtools failed to install:', e.toString())
+    }
+  }
+  createWindow()
+})
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
