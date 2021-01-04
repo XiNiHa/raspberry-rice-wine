@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div class="bg-black w-full h-full">
   </div>
 </template>
 
@@ -10,7 +10,3 @@ export default defineComponent({
   name: 'App'
 })
 </script>
-
-<style lang="scss">
-
-</style>
