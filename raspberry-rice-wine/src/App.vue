@@ -1,15 +1,23 @@
 <template>
   <div class="w-full h-full">
-    <Header />
+    <Header v-if="showHeader" />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import Header from './components/base/Header.vue'
 
 export default defineComponent({
   name: 'App',
-  components: { Header }
+  components: { Header },
+  setup () {
+    const showHeader = ref(true)
+
+    window.ipcRenderer.on('enter-fullscreen', () => { showHeader.value = false })
+    window.ipcRenderer.on('leave-fullscreen', () => { showHeader.value = true })
+
+    return { showHeader }
+  }
 })
 </script>

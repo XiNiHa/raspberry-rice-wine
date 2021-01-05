@@ -21,6 +21,7 @@ function createWindow () {
     width: 800,
     height: 600,
     frame: false,
+    titleBarStyle: 'hiddenInset',
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -39,6 +40,8 @@ function createWindow () {
     win.loadURL('app://./index.html')
   }
 
+  win.on('enter-full-screen', () => win?.webContents.send('enter-fullscreen'))
+  win.on('leave-full-screen', () => win?.webContents.send('leave-fullscreen'))
   win.on('closed', () => {
     win = null
   })
