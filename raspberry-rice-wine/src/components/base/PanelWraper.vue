@@ -4,9 +4,7 @@ import { computed, defineComponent, reactive } from 'vue'
 import { insertBetween } from '../../common/utils'
 import { Tab } from './LayoutTypes'
 
-enum EdgeDragType {
-  Row, Column, Both
-}
+enum EdgeDragType { Row, Column, Both }
 
 export default defineComponent({
   props: {
@@ -68,34 +66,17 @@ export default defineComponent({
     const colCount = this.state.colWidths.length
     const rowCount = this.state.rowHeights.length
 
-    const childs: JSX.Element[] = []
+    const children: JSX.Element[] = []
 
     const getEdge = (type: EdgeDragType, rowIndex: number, colIndex: number) => {
-      let cursor: string
-
-      switch (type) {
-        case EdgeDragType.Row: {
-          cursor = 'row-resize'
-          break
-        }
-        case EdgeDragType.Column: {
-          cursor = 'col-resize'
-          break
-        }
-        case EdgeDragType.Both: {
-          cursor = 'move'
-        }
-      }
+      const cursor = type === EdgeDragType.Row ? 'row-resize'
+        : type === EdgeDragType.Column ? 'col-resize'
+          : 'move'
 
       return <div class="bg-black relative">
         <div class="absolute top-0 left-0 w-full h-full p-1 -m-1" style={{ cursor, zIndex: type === EdgeDragType.Both ? 2 : 1 }} onMousedown={(e) => {
           if (e.target) {
-            this.state.currentEdgeDrag = {
-              element: e.target as Element,
-              type,
-              rowIndex,
-              colIndex
-            }
+            this.state.currentEdgeDrag = { type, rowIndex, colIndex, element: e.target as Element }
           }
         }} />
       </div>
@@ -103,26 +84,24 @@ export default defineComponent({
 
     const slot = this.$slots.default?.({
       drag: this.state.currentDrag,
-      setDrag: (drag: Tab) => {
-        this.state.currentDrag = drag
-      }
+      setDrag: (drag: Tab) => { this.state.currentDrag = drag }
     })
     if (slot) {
       for (let i = 0; i < colCount * rowCount; i++) {
         if (i % colCount > 0) {
-          childs.push(getEdge(EdgeDragType.Column, Math.floor(i / colCount), i % colCount))
+          children.push(getEdge(EdgeDragType.Column, Math.floor(i / colCount), i % colCount))
         } else if (i !== 0) {
           for (let j = 0; j < colCount; j++) {
             if (j !== 0) {
-              childs.push(getEdge(EdgeDragType.Both, i / colCount, j))
+              children.push(getEdge(EdgeDragType.Both, i / colCount, j))
             }
 
-            childs.push(getEdge(EdgeDragType.Row, i / colCount, j))
+            children.push(getEdge(EdgeDragType.Row, i / colCount, j))
           }
         }
 
-        if (i < slot.length) childs.push(slot[i])
-        else childs.push(<div />)
+        if (i < slot.length) children.push(slot[i])
+        else children.push(<div />)
       }
     }
 
@@ -140,16 +119,17 @@ export default defineComponent({
       }
     }
 
-    return <div class="grid overflow-hidden" style={{
-      gridTemplateColumns: this.cols.map(i => i + 'px').join(' '),
-      gridTemplateRows: this.rows.map(i => i + 'px').join(' ')
-    }} ref="wrapper" onMouseup={() => { this.state.currentEdgeDrag = null }} onMousemove={(e) => { if (this.state.currentEdgeDrag) onEdgeMove(e) }}>
-      { childs }
+    return <div
+      class="grid overflow-hidden"
+      style={{
+        gridTemplateColumns: this.cols.map(i => i + 'px').join(' '),
+        gridTemplateRows: this.rows.map(i => i + 'px').join(' ')
+      }}
+      ref="wrapper"
+      onMouseup={() => { this.state.currentEdgeDrag = null }}
+      onMousemove={(e) => { if (this.state.currentEdgeDrag) onEdgeMove(e) }}>
+      { children }
     </div>
   }
 })
 </script>
-
-<style scoped>
-
-</style>

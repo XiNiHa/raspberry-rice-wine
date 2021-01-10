@@ -56,11 +56,9 @@ export default defineComponent({
       selfHandled: false
     })
 
-    function setDrag (tab: Tab) {
-      emit('set-drag', tab)
-    }
+    const setDrag = (tab: Tab) => emit('set-drag', tab)
 
-    function dropAt (index: number) {
+    const dropAt = (index: number) => {
       if (props.drag) {
         const old = state.tabs.indexOf(props.drag)
 
@@ -76,18 +74,16 @@ export default defineComponent({
       }
     }
 
-    function addTempDrop (index: number) {
-      state.tempDrops.push(index)
-    }
+    const addTempDrop = (index: number) => state.tempDrops.push(index)
 
-    function removeTempDrop (index: number) {
+    const removeTempDrop = (index: number) => {
       const innerIndex = state.tempDrops.indexOf(index)
       if (innerIndex !== -1) {
         state.tempDrops.splice(innerIndex, 1)
       }
     }
 
-    function handleDrop (prev?: Tab | null) {
+    const handleDrop = (prev?: Tab | null) => {
       if (state.selfHandled) {
         state.selfHandled = false
       } else if (prev) {
@@ -102,13 +98,13 @@ export default defineComponent({
       state.tempDrops.splice(0)
     }
 
-    const getActiveClasses = (index: number) => state.activeIndex === index ? ['bg-white', 'border-l', 'border-t', 'border-r', 'border-gray-400', 'rounded-t-sm'] : ['bg-gray-200', 'border', 'border-transparent']
+    const getActiveClasses = (index: number) => state.activeIndex === index
+      ? ['bg-white', 'border-l', 'border-t', 'border-r', 'border-gray-400', 'rounded-t-sm']
+      : ['bg-gray-200', 'border', 'border-transparent']
     const getTempDropClasses = (index: number) => state.tempDrops.includes(index) && state.activeIndex !== index ? ['bg-gray-300'] : []
 
     watch(() => props.drag, (v, prev) => {
-      if (v == null) {
-        handleDrop(prev)
-      }
+      if (v == null) { handleDrop(prev) }
     })
 
     return { state, setDrag, dropAt, addTempDrop, removeTempDrop, getActiveClasses, getTempDropClasses, nextTick }
