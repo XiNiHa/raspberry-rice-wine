@@ -1,113 +1,123 @@
 <template>
-  <div class="m-1 shadow flex flex-col">
-    <div class="flex">
+  <div class="shadow flex flex-col border border-gray-900" @drop.prevent="drop">
+    <div class="tabbar flex items-stretch h-7 bg-gray-800 overflow-x-auto overflow-y-hidden">
       <div
-        v-for="(tab, i) in state.tabs"
+        v-for="(tab, i) in tabs"
         :key="i"
         draggable="true"
         class="px-2"
-        :class="[
-          ...getTempDropClasses(i),
-          ...getActiveClasses(i)
-        ]"
+        :class="getTabClasses(i)"
         @dragstart="setDrag(tab)"
-        @dragenter.stop="addTempDrop(i)"
-        @dragleave="removeTempDrop(i)"
+        @dragenter.stop="setDropIndex(i)"
+        @dragleave="removeDropIndex"
         @dragover.prevent
-        @drop.prevent.stop="dropAt(i)"
-        @mousedown="state.activeIndex = i">
+        @mousedown="$emit('select-tab', i)">
         {{ tab.title }}
       </div>
       <div
-        class="flex-grow bg-gray-200"
-        :class="getTempDropClasses(state.tabs.length)"
-        @dragenter.stop="addTempDrop(state.tabs.length)"
-        @dragleave="removeTempDrop(state.tabs.length)"
-        @dragover.prevent
-        @drop.prevent.stop="dropAt(state.tabs.length)" />
+        class="flex-grow bg-gray-800"
+        :class="getTabClasses(tabs.length)"
+        @dragenter.stop="setDropIndex(tabs.length)"
+        @dragleave="removeDropIndex"
+        @dragover.prevent />
     </div>
-    <div class="flex-grow bg-white">
-
+    <div class="flex-grow bg-gray-700 relative">
+      <div class="absolute top-0 left-0 right-0 bottom-0 transition-all bg-white" :class="state.tempDrop === index ? 'opacity-20' : 'opacity-0'"></div>
+      <div
+        v-if="dragging"
+        class="absolute top-0 left-0 right-0 bottom-0 flex"
+        @dragenter.stop="setDropIndex(index)"
+        @dragleave="removeDropIndex"
+        @dragover.prevent></div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick, Prop, reactive, watch } from 'vue'
+import { defineComponent, nextTick, PropType, reactive, watch } from 'vue'
 import { Tab } from './LayoutTypes'
 
 export default defineComponent({
   props: {
-    drag: {
-      type: Object,
+    dragging: {
+      type: Boolean,
+      default: false
+    },
+    index: {
+      type: Number,
+      default: 0
+    },
+    setDrag: {
+      type: Function as PropType<(tab: Tab) => void>,
       default: null
-    } as Prop<Tab | null>
+    },
+    tabs: {
+      type: Array as PropType<Tab[]>,
+      default: () => []
+    },
+    onDrop: {
+      type: Function as PropType<(index: number) => void>,
+      default: null
+    },
+    onSelectTab: {
+      type: Function as PropType<(index: number) => void>,
+      default: null
+    }
   },
-  emits: ['set-drag', 'complete-drag'],
+  emits: ['drop', 'select-tab'],
   setup (props, { emit }) {
     const state = reactive({
-      tabs: [
-        { title: Math.random().toFixed(2) },
-        { title: Math.random().toFixed(2) },
-        { title: Math.random().toFixed(2) }
-      ] as Tab[],
-      tempDrops: [] as number[],
-      activeIndex: 0,
-      selfHandled: false
+      tempDrop: -1,
+      tempDropLock: false
     })
 
-    const setDrag = (tab: Tab) => emit('set-drag', tab)
-
-    const dropAt = (index: number) => {
-      if (props.drag) {
-        const old = state.tabs.indexOf(props.drag)
-
-        if (old !== -1) {
-          state.tabs.splice(index, 0, state.tabs.splice(old, 1)[0])
-        } else {
-          state.tabs.splice(index, 0, props.drag)
-        }
-
-        state.selfHandled = true
-        state.activeIndex = Math.min(index, state.tabs.length - 1)
-        emit('complete-drag')
+    const drop = () => {
+      if (props.dragging) {
+        emit('drop', state.tempDrop)
       }
     }
 
-    const addTempDrop = (index: number) => state.tempDrops.push(index)
+    const setDropIndex = (index: number) => {
+      state.tempDrop = index
+      state.tempDropLock = true
+      setTimeout(() => { state.tempDropLock = false }, 0)
+    }
 
-    const removeTempDrop = (index: number) => {
-      const innerIndex = state.tempDrops.indexOf(index)
-      if (innerIndex !== -1) {
-        state.tempDrops.splice(innerIndex, 1)
+    const removeDropIndex = () => {
+      if (state.tempDropLock) {
+        state.tempDropLock = false
+      } else {
+        state.tempDrop = -1
       }
     }
 
-    const handleDrop = (prev?: Tab | null) => {
-      if (state.selfHandled) {
-        state.selfHandled = false
-      } else if (prev) {
-        const index = state.tabs.indexOf(prev)
-        if (index !== -1) {
-          if (index >= state.tabs.length - 1) {
-            state.activeIndex = state.tabs.length - 2
-          }
-          state.tabs.splice(index, 1)
-        }
+    watch(() => props.dragging, (v) => {
+      if (!v) {
+        state.tempDrop = -1
       }
-      state.tempDrops.splice(0)
-    }
-
-    const getActiveClasses = (index: number) => state.activeIndex === index
-      ? ['bg-white', 'border-l', 'border-t', 'border-r', 'border-gray-400', 'rounded-t-sm']
-      : ['bg-gray-200', 'border', 'border-transparent']
-    const getTempDropClasses = (index: number) => state.tempDrops.includes(index) && state.activeIndex !== index ? ['bg-gray-300'] : []
-
-    watch(() => props.drag, (v, prev) => {
-      if (v == null) { handleDrop(prev) }
     })
 
-    return { state, setDrag, dropAt, addTempDrop, removeTempDrop, getActiveClasses, getTempDropClasses, nextTick }
+    const getTabClasses = (index: number) => {
+      const active = props.index === index
+      const tempDrop = state.tempDrop === index
+
+      if (active) {
+        return ['bg-gray-700', 'rounded-t-sm', 'text-white']
+      } else if (tempDrop) {
+        return ['bg-gray-700', 'text-gray-400']
+      } else {
+        return ['bg-gray-800', 'text-gray-400']
+      }
+    }
+
+    return { state, drop, setDropIndex, removeDropIndex, getTabClasses, nextTick }
   }
 })
 </script>
+
+<style scoped>
+.tabbar::-webkit-scrollbar {
+  display: none;
+  height: 200%;
+}
+</style>

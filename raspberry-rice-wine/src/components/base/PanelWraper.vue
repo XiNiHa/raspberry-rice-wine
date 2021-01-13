@@ -1,10 +1,16 @@
 <script lang="tsx">
 /// <reference types="resize-observer-browser" />
-import { computed, defineComponent, reactive } from 'vue'
+import { computed, defineComponent, reactive, watch } from 'vue'
 import { insertBetween } from '../../common/utils'
 import { Tab } from './LayoutTypes'
+import Panel from './Panel.vue'
 
 enum EdgeDragType { Row, Column, Both }
+
+interface PanelData {
+  index: number;
+  tabs: Tab[];
+}
 
 export default defineComponent({
   props: {
@@ -17,15 +23,18 @@ export default defineComponent({
       default: 3
     }
   },
-  setup (props) {
+  setup (props, { slots }) {
     const state = reactive({
       wrapperWidth: 0,
       wrapperHeight: 0,
       colWidths: new Array(props.initialCols).fill(0),
       rowHeights: new Array(props.initialRows).fill(0),
       resizeObserver: null as ResizeObserver | null,
+      panels: [] as (PanelData | null)[][],
 
       currentDrag: null as Tab | null,
+      currentDragRow: -1,
+      currentDragCol: -1,
       currentEdgeDrag: null as {
         element: Element;
         type: EdgeDragType;
@@ -50,7 +59,34 @@ export default defineComponent({
       state.wrapperHeight = el.contentRect.height
     }
 
-    return { state, handleResize, cols, rows }
+    const dragging = computed(() => !!state.currentDrag)
+
+    watch(() => ({ slots, rows: props.initialRows, cols: props.initialCols }), ({ slots, rows, cols }) => {
+      for (let i = 0; i < rows; i++) {
+        state.panels[i] = []
+
+        for (let j = 0; j < cols; j++) {
+          const currSlot = slots[`${i}-${j}`]
+          if (currSlot) {
+            state.panels[i][j] = {
+              index: 0,
+              tabs: []
+            }
+          } else {
+            state.panels[i][j] = {
+              index: 0,
+              tabs: [
+                { title: Math.random().toFixed(4) },
+                { title: Math.random().toFixed(4) },
+                { title: Math.random().toFixed(4) }
+              ]
+            }
+          }
+        }
+      }
+    }, { immediate: true, deep: true })
+
+    return { state, handleResize, cols, rows, dragging }
   },
   mounted () {
     const wrapper = this.$refs.wrapper as HTMLElement
@@ -68,6 +104,17 @@ export default defineComponent({
 
     const children: JSX.Element[] = []
 
+    const setDrag = (drag: Tab | null, i: number, j: number) => {
+      this.state.currentDrag = drag
+      if (drag == null) {
+        this.state.currentDragRow = -1
+        this.state.currentDragCol = -1
+      } else {
+        this.state.currentDragRow = i
+        this.state.currentDragCol = j
+      }
+    }
+
     const getEdge = (type: EdgeDragType, rowIndex: number, colIndex: number) => {
       const cursor = type === EdgeDragType.Row ? 'row-resize'
         : type === EdgeDragType.Column ? 'col-resize'
@@ -82,26 +129,46 @@ export default defineComponent({
       </div>
     }
 
-    const slot = this.$slots.default?.({
-      drag: this.state.currentDrag,
-      setDrag: (drag: Tab) => { this.state.currentDrag = drag }
-    })
-    if (slot) {
-      for (let i = 0; i < colCount * rowCount; i++) {
-        if (i % colCount > 0) {
-          children.push(getEdge(EdgeDragType.Column, Math.floor(i / colCount), i % colCount))
-        } else if (i !== 0) {
-          for (let j = 0; j < colCount; j++) {
-            if (j !== 0) {
-              children.push(getEdge(EdgeDragType.Both, i / colCount, j))
+    for (let i = 0; i < rowCount; i++) {
+      for (let j = 0; j < colCount; j++) {
+        const current = this.state.panels[i][j]
+        if (current != null) {
+          if (j > 0) {
+            children.push(getEdge(EdgeDragType.Column, i, j))
+          } else if (i !== 0) {
+            for (let k = 0; k < colCount; k++) {
+              if (k !== 0) {
+                children.push(getEdge(EdgeDragType.Both, i, k))
+              }
+
+              children.push(getEdge(EdgeDragType.Row, i, k))
             }
-
-            children.push(getEdge(EdgeDragType.Row, i / colCount, j))
           }
-        }
 
-        if (i < slot.length) children.push(slot[i])
-        else children.push(<div />)
+          const vnode = <Panel
+            dragging={this.dragging}
+            index={current.index}
+            tabs={current.tabs}
+            setDrag={(tab) => setDrag(tab, i, j)}
+            onSelectTab={(index: number) => {
+              current.index = index
+            }}
+            onDrop={(index: number) => {
+              if (this.state.currentDrag) {
+                const from = this.state.panels[this.state.currentDragRow][this.state.currentDragCol]
+                const to = current
+
+                if (!from || !to) return
+
+                from.tabs.splice(from.tabs.indexOf(this.state.currentDrag), 1)
+                to.tabs.splice(index, 0, this.state.currentDrag)
+                from.index = Math.min(Math.max(index - 1, 0), from.tabs.length - 1)
+                to.index = Math.min(Math.max(index, 0), to.tabs.length - 1)
+              }
+            }} />
+
+          children.push(vnode)
+        }
       }
     }
 
@@ -127,7 +194,8 @@ export default defineComponent({
       }}
       ref="wrapper"
       onMouseup={() => { this.state.currentEdgeDrag = null }}
-      onMousemove={(e) => { if (this.state.currentEdgeDrag) onEdgeMove(e) }}>
+      onMousemove={(e) => { if (this.state.currentEdgeDrag) onEdgeMove(e) }}
+      onDragend={() => setDrag(null, -1, -1)}>
       { children }
     </div>
   }

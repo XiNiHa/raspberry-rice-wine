@@ -1,13 +1,7 @@
 <template>
   <div class="w-full h-full max-h-screen flex flex-col">
     <Header v-if="showHeader" class="flex-shrink-0" />
-    <PanelWrapper class="flex-grow" v-slot="{drag, setDrag}" :initial-rows="2">
-      <Panel :drag="drag" @set-drag="setDrag" @complete-drag="setDrag(null)" />
-      <Panel :drag="drag" @set-drag="setDrag" @complete-drag="setDrag(null)" />
-      <Panel :drag="drag" @set-drag="setDrag" @complete-drag="setDrag(null)" />
-      <Panel :drag="drag" @set-drag="setDrag" @complete-drag="setDrag(null)" />
-      <Panel :drag="drag" @set-drag="setDrag" @complete-drag="setDrag(null)" />
-      <Panel :drag="drag" @set-drag="setDrag" @complete-drag="setDrag(null)" />
+    <PanelWrapper class="flex-grow" :initial-rows="2">
     </PanelWrapper>
   </div>
 </template>
@@ -16,11 +10,10 @@
 import { defineComponent, ref } from 'vue'
 import Header from './components/base/Header.vue'
 import PanelWrapper from './components/base/PanelWraper.vue'
-import Panel from './components/base/Panel.vue'
 
 export default defineComponent({
   name: 'App',
-  components: { Header, PanelWrapper, Panel },
+  components: { Header, PanelWrapper },
   setup () {
     const showHeader = ref(true)
 
