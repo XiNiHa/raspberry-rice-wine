@@ -11,13 +11,13 @@ export interface Props {
   [name: string]: Property;
 }
 
-export interface Layer<T extends Props> {
+export interface Layer {
   name: string;
-  getHtml: (props: T) => string;
-  getCss: (props: T) => string;
+  getHtml: (props: Props) => string;
+  getCss: (props: Props) => string;
 }
 
 export interface Template {
   name: string;
-  layers: Layer<Props>[];
+  layers: Layer[];
 }
