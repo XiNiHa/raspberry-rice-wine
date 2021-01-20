@@ -1,18 +1,12 @@
-export type FieldValue = number | string | Array<Field>
-
 export interface Field {
-  get: () => FieldValue;
-  update: (newValue: FieldValue) => void;
+  name: string;
+  value: string;
 }
 
 export interface Script {
-  fields: {
-    [key: string]: Field;
-  };
+  fields: Field[];
 }
 
 export interface ScriptSet {
   scripts: Script[];
-
-  new: () => Script;
 }

@@ -1,5 +1,16 @@
 {
   "app": {
     "title": "RRW"
+  },
+  "common": {
+    "tab": "Tab"
+  },
+  "scriptEditor": {
+    "title": "Script Editor",
+    "newFieldName": "New Field"
+  },
+  "scriptList": {
+    "title": "Script List",
+    "emptyScript": "Empty Script"
   }
 }

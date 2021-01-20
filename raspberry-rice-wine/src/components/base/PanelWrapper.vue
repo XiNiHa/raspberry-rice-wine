@@ -1,6 +1,7 @@
 <script lang="tsx">
 /// <reference types="resize-observer-browser" />
-import { computed, defineComponent, reactive, watch } from 'vue'
+import { computed, defineComponent, reactive, VNode, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { insertBetween } from '../../common/utils'
 import { Tab } from './LayoutTypes'
 import Panel from './Panel.vue'
@@ -24,6 +25,8 @@ export default defineComponent({
     }
   },
   setup (props, { slots }) {
+    const { t } = useI18n()
+
     const state = reactive({
       wrapperWidth: 0,
       wrapperHeight: 0,
@@ -59,28 +62,35 @@ export default defineComponent({
       state.wrapperHeight = el.contentRect.height
     }
 
-    const dragging = computed(() => !!state.currentDrag)
+    const dragging = computed(() => state.currentDrag != null)
+
+    const updatePanelTabs = (panel: PanelData, newVNodes: VNode[]) => {
+      panel.tabs = newVNodes.map(vnode => ({
+        title: vnode.props?.title ?? t('common.tab'),
+        vnode
+      }))
+    }
 
     watch(() => ({ slots, rows: props.initialRows, cols: props.initialCols }), ({ slots, rows, cols }) => {
       for (let i = 0; i < rows; i++) {
         state.panels[i] = []
 
         for (let j = 0; j < cols; j++) {
+          state.panels[i][j] = {
+            index: 0,
+            tabs: []
+          }
+
           const currSlot = slots[`${i}-${j}`]
           if (currSlot) {
-            state.panels[i][j] = {
-              index: 0,
-              tabs: []
-            }
-          } else {
-            state.panels[i][j] = {
-              index: 0,
-              tabs: [
-                { title: Math.random().toFixed(4) },
-                { title: Math.random().toFixed(4) },
-                { title: Math.random().toFixed(4) }
-              ]
-            }
+            watch(
+              () => currSlot(),
+              (v) => {
+                const panelData = state.panels[i][j]
+                panelData && updatePanelTabs(panelData, v)
+              },
+              { immediate: true, deep: true }
+            )
           }
         }
       }
@@ -164,6 +174,7 @@ export default defineComponent({
                 to.tabs.splice(index, 0, this.state.currentDrag)
                 from.index = Math.min(Math.max(index - 1, 0), from.tabs.length - 1)
                 to.index = Math.min(Math.max(index, 0), to.tabs.length - 1)
+                this.state.currentDrag = null
               }
             }} />
 

@@ -1,5 +1,16 @@
 {
   "app": {
     "title": "복분자막걸리"
+  },
+  "common": {
+    "tab": "탭"
+  },
+  "scriptEditor": {
+    "title": "스크립트 편집기",
+    "newFieldName": "새 필드"
+  },
+  "scriptList": {
+    "title": "스크립트 목록",
+    "emptyScript": "빈 스크립트"
   }
 }

@@ -1,6 +1,8 @@
 <template>
-  <div class="shadow flex flex-col border border-gray-900" @drop.prevent="drop">
-    <div class="tabbar flex items-stretch h-7 bg-gray-800 overflow-x-auto overflow-y-hidden">
+  <div
+    class="max-w-full max-h-full shadow flex flex-col border border-gray-900"
+    @drop.prevent="drop">
+    <div class="tabbar flex-shrink-0 flex items-stretch h-7 bg-gray-800 overflow-x-auto overflow-y-hidden">
       <div
         v-for="(tab, i) in tabs"
         :key="i"
@@ -21,23 +23,29 @@
         @dragleave="removeDropIndex"
         @dragover.prevent />
     </div>
-    <div class="flex-grow bg-gray-700 relative">
-      <div class="absolute top-0 left-0 right-0 bottom-0 transition-all bg-white" :class="state.tempDrop === index ? 'opacity-20' : 'opacity-0'"></div>
+    <div class="flex-grow flex-shrink bg-gray-700 relative overflow-auto">
+      <div
+        v-if="dragging"
+        class="absolute top-0 left-0 right-0 bottom-0 transition-all bg-white"
+        :class="state.tempDrop === index ? 'opacity-20' : 'opacity-0'" />
       <div
         v-if="dragging"
         class="absolute top-0 left-0 right-0 bottom-0 flex"
         @dragenter.stop="setDropIndex(index)"
         @dragleave="removeDropIndex"
-        @dragover.prevent></div>
+        @dragover.prevent />
+      <VNodeRenderer :vnode="currentTab?.vnode" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick, PropType, reactive, watch } from 'vue'
+import { defineComponent, nextTick, PropType, reactive, watch, computed } from 'vue'
 import { Tab } from './LayoutTypes'
+import VNodeRenderer from './VNodeRenderer.vue'
 
 export default defineComponent({
+  components: { VNodeRenderer },
   props: {
     dragging: {
       type: Boolean,
@@ -67,7 +75,7 @@ export default defineComponent({
   emits: ['drop', 'select-tab'],
   setup (props, { emit }) {
     const state = reactive({
-      tempDrop: -1,
+      tempDrop: Number.MIN_SAFE_INTEGER,
       tempDropLock: false
     })
 
@@ -87,13 +95,13 @@ export default defineComponent({
       if (state.tempDropLock) {
         state.tempDropLock = false
       } else {
-        state.tempDrop = -1
+        state.tempDrop = Number.MIN_SAFE_INTEGER
       }
     }
 
     watch(() => props.dragging, (v) => {
       if (!v) {
-        state.tempDrop = -1
+        state.tempDrop = Number.MIN_SAFE_INTEGER
       }
     })
 
@@ -110,7 +118,9 @@ export default defineComponent({
       }
     }
 
-    return { state, drop, setDropIndex, removeDropIndex, getTabClasses, nextTick }
+    const currentTab = computed(() => props.tabs[props.index])
+
+    return { state, drop, setDropIndex, removeDropIndex, getTabClasses, currentTab, nextTick }
   }
 })
 </script>
