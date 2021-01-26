@@ -34,6 +34,7 @@ export default defineComponent({
       rowHeights: new Array(props.initialRows).fill(0),
       resizeObserver: null as ResizeObserver | null,
       panels: [] as (PanelData | null)[][],
+      keyedTabs: {} as Record<string, Tab>,
 
       currentDrag: null as Tab | null,
       currentDragRow: -1,
@@ -65,32 +66,56 @@ export default defineComponent({
     const dragging = computed(() => state.currentDrag != null)
 
     const updatePanelTabs = (panel: PanelData, newVNodes: VNode[]) => {
-      panel.tabs = newVNodes.map(vnode => ({
-        title: vnode.props?.title ?? t('common.tab'),
-        vnode
-      }))
+      const tabs: Tab[] = panel.tabs.filter(tab => tab.vnode?.key)
+
+      newVNodes.forEach(vnode => {
+        const tab = {
+          title: vnode.props?.title ?? t('common.tab'),
+          vnode
+        }
+
+        if (vnode.key) {
+          if (state.keyedTabs[vnode.key]) {
+            state.keyedTabs[vnode.key].title = tab.title
+            state.keyedTabs[vnode.key].vnode = vnode
+          } else {
+            state.keyedTabs[vnode.key] = tab
+            tabs.push(tab)
+          }
+        } else {
+          tabs.push(tab)
+        }
+      })
+
+      panel.tabs = tabs
     }
 
-    watch(() => ({ slots, rows: props.initialRows, cols: props.initialCols }), ({ slots, rows, cols }) => {
+    watch(() => ({ slots, slotContents: Object.values(slots).map(slot => slot?.()), rows: props.initialRows, cols: props.initialCols }), ({ slots, rows, cols }) => {
       for (let i = 0; i < rows; i++) {
-        state.panels[i] = []
+        if (!state.panels[i]) {
+          state.panels[i] = []
+        }
 
         for (let j = 0; j < cols; j++) {
-          state.panels[i][j] = {
-            index: 0,
-            tabs: []
+          if (!state.panels[i][j]) {
+            state.panels[i][j] = {
+              index: 0,
+              tabs: []
+            }
           }
 
           const currSlot = slots[`${i}-${j}`]
           if (currSlot) {
-            watch(
-              () => currSlot(),
-              (v) => {
-                const panelData = state.panels[i][j]
-                panelData && updatePanelTabs(panelData, v)
-              },
-              { immediate: true, deep: true }
-            )
+            const panelData = state.panels[i][j]
+            if (panelData) {
+              updatePanelTabs(panelData, currSlot())
+
+              if (panelData.index === -1) {
+                panelData.index = 0
+              } else if (panelData.index >= panelData.tabs.length) {
+                panelData.index = panelData.tabs.length - 1
+              }
+            }
           }
         }
       }
