@@ -3,10 +3,17 @@
     <li
       v-for="(script, i) in scripts"
       :key="i"
-      class="list-inside list-decimal select-none w-full px-2 text-gray-200 whitespace-nowrap overflow-hidden overflow-ellipsis hover:bg-gray-500"
+      class="flex justify-between select-none w-full px-2 hover:bg-gray-500"
       :class="{'bg-gray-500': currentIndex === i}"
-      @click="$emit('select', i)">
-      {{ formatScript(script) }}
+      draggable="true"
+      @click="$emit('select', i)"
+      @dragover.prevent>
+      <span class="text-gray-200 whitespace-nowrap overflow-hidden overflow-ellipsis">
+        {{ i + 1 + '. ' + formatScript(script) }}
+      </span>
+      <button class="float-right px-1 focus:outline-none" @click.stop="$emit('remove', i)">
+        <i class="fas fa-times" />
+      </button>
     </li>
     <li
       class="select-none w-full text-center text-sm py-1 text-gray-200 hover:bg-gray-500"
@@ -32,7 +39,7 @@ export default defineComponent({
       default: -1
     }
   },
-  emits: ['select', 'add'],
+  emits: ['select', 'add', 'remove'],
   setup () {
     const { t } = useI18n()
 

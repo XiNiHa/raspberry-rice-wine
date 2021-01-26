@@ -4,14 +4,17 @@
     :initial-cols="2">
     <template #0-0>
       <ScriptList
+        key="ScriptList"
         :title="t('scriptList.title')"
         :scripts="state.scriptSet.scripts"
         :current-index="state.scriptIndex"
         @select="state.scriptIndex = $event"
-        @add="addScript" />
+        @add="addScript"
+        @remove="removeScript" />
     </template>
     <template #0-1>
       <ScriptEditor
+        key="ScriptEditor"
         v-model="state.scriptSet.scripts[state.scriptIndex]"
         :title="t('scriptEditor.title')" />
     </template>
@@ -84,7 +87,15 @@ export default defineComponent({
       })
     }
 
-    return { t, state, addScript }
+    const removeScript = (index: number) => {
+      if (state.scriptIndex >= state.scriptSet.scripts.length - 1) {
+        state.scriptIndex = state.scriptSet.scripts.length - 2
+      }
+
+      state.scriptSet.scripts.splice(index, 1)
+    }
+
+    return { t, state, addScript, removeScript }
   }
 })
 </script>
