@@ -12,7 +12,7 @@
         @dragstart="setDrag(tab)"
         @dragenter.stop="setDropIndex(i)"
         @dragleave="removeDropIndex"
-        @dragover.prevent
+        @dragover="(e) => dragging && e.preventDefault()"
         @mousedown="$emit('select-tab', i)">
         {{ tab.title }}
       </div>
@@ -21,7 +21,7 @@
         :class="getTabClasses(tabs.length)"
         @dragenter.stop="setDropIndex(tabs.length)"
         @dragleave="removeDropIndex"
-        @dragover.prevent />
+        @dragover="(e) => dragging && e.preventDefault()" />
     </div>
     <div class="flex-grow flex-shrink bg-gray-700 relative overflow-auto">
       <div
@@ -33,7 +33,7 @@
         class="absolute top-0 left-0 right-0 bottom-0 flex"
         @dragenter.stop="setDropIndex(index)"
         @dragleave="removeDropIndex"
-        @dragover.prevent />
+        @dragover="(e) => dragging && e.preventDefault()" />
       <VNodeRenderer :vnode="currentTab?.vnode" />
     </div>
   </div>

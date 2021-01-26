@@ -25,9 +25,9 @@
         class="text-center select-none px-4"
         :colspan="2">
         <p
-          class="block w-full my-4 py-2 text-2xl text-white font-bold transition-colors duration-150 rounded-md cursor-pointer hover:bg-gray-300 hover:text-gray-800"
+          class="block w-full my-4 py-2 text-lg text-white font-bold transition-colors duration-150 rounded-md cursor-pointer hover:bg-gray-300 hover:text-gray-800"
           @click="addField">
-          +
+          <i class="fas fa-plus" />
         </p>
       </td>
     </tr>

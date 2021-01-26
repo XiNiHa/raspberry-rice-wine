@@ -9,9 +9,9 @@
       {{ formatScript(script) }}
     </li>
     <li
-      class="select-none w-full text-center text-gray-200 hover:bg-gray-500"
+      class="select-none w-full text-center text-sm py-1 text-gray-200 hover:bg-gray-500"
       @click="$emit('add')">
-      +
+      <i class="fas fa-plus" />
     </li>
   </ol>
 </template>
