@@ -7,7 +7,9 @@
       :class="{'bg-gray-500': currentIndex === i}"
       draggable="true"
       @click="$emit('select', i)"
-      @dragover.prevent>
+      @dragstart.stop="setDrag(i)"
+      @dragover.prevent
+      @drop.stop="dropAt(i)">
       <span class="text-gray-200 whitespace-nowrap overflow-hidden overflow-ellipsis">
         {{ i + 1 + '. ' + formatScript(script) }}
       </span>
@@ -17,6 +19,8 @@
     </li>
     <li
       class="select-none w-full text-center text-sm py-1 text-gray-200 hover:bg-gray-500"
+      @dragover.prevent
+      @drop.stop="dropAt(scripts.length)"
       @click="$emit('add')">
       <i class="fas fa-plus" />
     </li>
@@ -25,7 +29,7 @@
 
 <script lang="ts">
 import { Script } from '@/common/script'
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, PropType, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
@@ -39,15 +43,26 @@ export default defineComponent({
       default: -1
     }
   },
-  emits: ['select', 'add', 'remove'],
-  setup () {
+  emits: ['select', 'add', 'remove', 'drop'],
+  setup (props, { emit }) {
     const { t } = useI18n()
+
+    const drag = ref(-1)
 
     const formatScript = (script: Script) => {
       return script.fields.map(field => `${field.name}: ${field.value}`).join(', ') || t('scriptList.emptyScript')
     }
 
-    return { formatScript }
+    const setDrag = (index: number) => { drag.value = index }
+    const dropAt = (index: number) => {
+      emit('drop', {
+        target: drag.value,
+        at: index
+      })
+      drag.value = -1
+    }
+
+    return { formatScript, setDrag, dropAt }
   }
 })
 </script>

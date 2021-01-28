@@ -10,7 +10,8 @@
         :current-index="state.scriptIndex"
         @select="state.scriptIndex = $event"
         @add="addScript"
-        @remove="removeScript" />
+        @remove="removeScript"
+        @drop="moveScript" />
     </template>
     <template #0-1>
       <ScriptEditor
@@ -95,7 +96,11 @@ export default defineComponent({
       state.scriptSet.scripts.splice(index, 1)
     }
 
-    return { t, state, addScript, removeScript }
+    const moveScript = ({ target, at }: {target: number; at: number}) => {
+      state.scriptSet.scripts.splice(at, 0, state.scriptSet.scripts.splice(target, 1)[0])
+    }
+
+    return { t, state, addScript, removeScript, moveScript }
   }
 })
 </script>
