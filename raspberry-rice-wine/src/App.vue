@@ -3,18 +3,17 @@
     <Header
       v-if="showHeader"
       class="flex-shrink-0" />
-    <ScriptSetEditor class="flex-grow" />
+    <RouterView class="flex-grow" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import Header from './components/base/Header.vue'
-import ScriptSetEditor from './components/script-editor/ScriptSetEditor.vue'
 
 export default defineComponent({
   name: 'App',
-  components: { Header, ScriptSetEditor },
+  components: { Header },
   setup () {
     const showHeader = ref(true)
 

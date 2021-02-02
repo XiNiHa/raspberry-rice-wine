@@ -16,23 +16,23 @@
       </HeaderButton>
     </div>
   </nav>
+  <Toolbar />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import HeaderButton from './HeaderButton.vue'
+import Toolbar from './toolbar/Toolbar.vue'
 
 export default defineComponent({
-  components: { HeaderButton },
+  components: { HeaderButton, Toolbar },
   setup () {
     const { t } = useI18n()
     const close = () => window.ipcRenderer.send('close')
     const isMac = window.platform === 'darwin'
 
-    return {
-      close, isMac, t
-    }
+    return { close, isMac, t }
   }
 })
 </script>

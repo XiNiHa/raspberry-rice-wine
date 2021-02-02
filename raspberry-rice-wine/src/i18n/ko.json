@@ -5,6 +5,18 @@
   "common": {
     "tab": "탭"
   },
+  "toolbar": {
+    "file": {
+      "title": "파일",
+      "newFile": "새 파일",
+      "openFile": "열기"
+    },
+    "view": {
+      "title": "보기",
+      "scriptEditor": "스크립트 편집기",
+      "settings": "설정"
+    }
+  },
   "scriptEditor": {
     "title": "스크립트 편집기",
     "newFieldName": "새 필드"

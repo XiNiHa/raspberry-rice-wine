@@ -5,6 +5,18 @@
   "common": {
     "tab": "Tab"
   },
+  "toolbar": {
+    "file": {
+      "title": "File",
+      "newFile": "New File",
+      "openFile": "Open"
+    },
+    "view": {
+      "title": "View",
+      "scriptEditor": "Script Editor",
+      "settings": "Settings"
+    }
+  },
   "scriptEditor": {
     "title": "Script Editor",
     "newFieldName": "New Field"
