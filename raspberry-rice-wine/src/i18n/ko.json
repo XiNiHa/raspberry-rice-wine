@@ -24,5 +24,15 @@
   "scriptList": {
     "title": "스크립트 목록",
     "emptyScript": "빈 스크립트"
+  },
+  "settings": {
+    "hotkey": "단축키",
+    "listening": "키 조합을 누르세요..."
+  },
+  "hotkey": {
+    "scriptEditor": {
+      "title": "스크립트 편집기",
+      "newField": "새 필드 만들기"
+    }
   }
 }

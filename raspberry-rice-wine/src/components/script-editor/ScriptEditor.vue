@@ -45,9 +45,12 @@
 </template>
 
 <script lang="ts">
-import { Script } from '@/common/script'
 import { defineComponent, PropType, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useHotkey } from 'vue-use-hotkey'
+import { useStore } from 'vuex'
+import { Script } from '@/common/script'
+import { State } from '@/store'
 
 export default defineComponent({
   props: {
@@ -59,6 +62,7 @@ export default defineComponent({
   emits: ['update:modelValue'],
   setup (props, { emit }) {
     const { t } = useI18n()
+    const store = useStore<State>()
 
     const copyFrom = (script: Script) => ({
       ...script,
@@ -86,6 +90,14 @@ export default defineComponent({
     const removeField = (index: number) => {
       state.script.fields.splice(index, 1)
     }
+
+    useHotkey([
+      {
+        keys: Array.from(store.state.hotkeyBinds.scriptEditor.newField.values()),
+        exact: true,
+        handler: () => addField()
+      }
+    ])
 
     return { t, state, addField, removeField, emitModel }
   }

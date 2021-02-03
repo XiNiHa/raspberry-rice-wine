@@ -24,5 +24,15 @@
   "scriptList": {
     "title": "Script List",
     "emptyScript": "Empty Script"
+  },
+  "settings": {
+    "hotkey": "Hotkeys",
+    "listening": "Listening for key combination..."
+  },
+  "hotkey": {
+    "scriptEditor": {
+      "title": "Script Editor",
+      "newField": "Create New Field"
+    }
   }
 }
