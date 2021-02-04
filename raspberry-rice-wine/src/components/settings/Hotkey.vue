@@ -24,10 +24,10 @@
 </template>
 
 <script lang="ts">
-import { State } from '@/store'
-import { computed, defineComponent, nextTick, ref } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
+import { State } from '@/store'
 
 export default defineComponent({
   setup () {
@@ -41,16 +41,25 @@ export default defineComponent({
       listening.value = true
 
       const newComb = new Set<string>()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const listeners = {} as Record<string, (e: any) => unknown>
 
-      /* eslint-disable prefer-const */
+      // eslint-disable-next-line prefer-const
       let timeout: NodeJS.Timeout
-      let cleanup: () => void
       let completed = false
-      /* eslint-enable prefer-const */
 
-      const clickListener = () => cleanup()
-      const keyDownListener = (e: KeyboardEvent) => newComb.add(e.key)
-      const keyUpListener = () => {
+      const cleanup = () => {
+        listening.value = false
+        completed = true
+        for (const [type, handler] of Object.entries(listeners)) {
+          window.removeEventListener(type, handler)
+        }
+        clearTimeout(timeout)
+      }
+
+      listeners.click = () => cleanup()
+      listeners.keydown = (e: KeyboardEvent) => newComb.add(e.key)
+      listeners.keyup = () => {
         if (listening.value && !completed) {
           cleanup()
           originComb.clear()
@@ -58,18 +67,11 @@ export default defineComponent({
         }
       }
 
-      cleanup = () => {
-        listening.value = false
-        completed = true
-        window.removeEventListener('click', clickListener)
-        window.removeEventListener('keydown', keyDownListener)
-        window.removeEventListener('keyup', keyUpListener)
-        clearTimeout(timeout)
-      }
-
-      window.addEventListener('keydown', keyDownListener)
-      window.addEventListener('keyup', keyUpListener)
-      setTimeout(() => window.addEventListener('click', clickListener), 0)
+      setTimeout(() => {
+        for (const [type, handler] of Object.entries(listeners)) {
+          window.addEventListener(type, handler)
+        }
+      }, 0)
       timeout = setTimeout(cleanup, 5000)
     }
 

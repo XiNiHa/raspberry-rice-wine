@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-full bg-gray-700 items-center z-50">
+  <div class="flex w-full bg-gray-700 items-center z-50" @click.stop>
     <ToolbarSection
       :title="t('toolbar.file.title')"
       :show-items="active === 0"
@@ -27,12 +27,11 @@
         </ToolbarItem>
       </RouterLink>
     </ToolbarSection>
-    <div v-if="active !== -1" class="absolute top-0 left-0 w-screen h-screen z-0" @click="active = -1" />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, watch } from 'vue'
 import ToolbarSection from './ToolbarSection.vue'
 import ToolbarItem from './ToolbarItem.vue'
 import ToolbarSeparator from './ToolbarSeparator.vue'
@@ -45,6 +44,17 @@ export default defineComponent({
 
     const active = ref(-1)
     const lock = ref(false)
+
+    watch(() => active.value, (curr, prev) => {
+      const handler = () => {
+        active.value = -1
+        window.removeEventListener('click', handler)
+      }
+
+      if (prev === -1) {
+        window.addEventListener('click', handler)
+      }
+    })
 
     const clickActivate = (index: number) => {
       if (!lock.value) {
