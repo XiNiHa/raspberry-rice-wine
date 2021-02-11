@@ -23,9 +23,9 @@
 </template>
 
 <script lang="ts">
-import { ScriptSet } from '@/common/script'
 import { defineComponent, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { ScriptSet } from '@/common/script'
 import PanelWrapper from '../base/PanelWrapper.vue'
 import ScriptList from './ScriptList.vue'
 import ScriptEditor from './ScriptEditor.vue'

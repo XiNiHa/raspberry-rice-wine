@@ -1,5 +1,5 @@
 <template>
-  <nav class="w-full h-10 bg-gray-700 shadow-md flex justify-between items-center z-50">
+  <nav class="w-full h-10 flex-shrink-0 bg-gray-700 shadow-md flex justify-between items-center z-50">
     <div
       class="flex-grow"
       :class="{ 'pl-16': isMac }"

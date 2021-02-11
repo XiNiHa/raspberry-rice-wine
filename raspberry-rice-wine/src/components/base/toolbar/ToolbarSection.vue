@@ -5,7 +5,7 @@
     <h2>{{ title }}</h2>
     <ul
       v-if="showItems"
-      class="absolute top-7 left-0 py-1 flex flex-col border-white bg-gray-300 bg-opacity-95 rounded-md shadow-md overflow-hidden z-50"
+      class="absolute top-7 left-0 py-1 flex flex-col items-stretch border-white bg-gray-300 bg-opacity-95 rounded-md shadow-md overflow-hidden z-50"
       @click="$emit('close-items')">
       <slot />
     </ul>
