@@ -1,20 +1,14 @@
 import Color from 'color'
 
-export type PropertyType = string | Color
-
-export interface Property {
-  value: PropertyType;
-  update: (newValue: PropertyType) => boolean;
-}
-
-export interface Props {
-  [name: string]: Property;
-}
+export type PropType = string | number | Color
 
 export interface Layer {
   name: string;
-  getHtml: (props: Props) => string;
-  getCss: (props: Props) => string;
+  isTextbox: boolean;
+  children?: Layer[];
+  props?: Record<string, PropType>;
+  styleGenerators?: ((props: Record<string, PropType>) => Record<string, string>)[];
+  plainStyles?: Record<string, string>;
 }
 
 export interface Template {

@@ -20,6 +20,11 @@
           {{ t('toolbar.view.scriptEditor') }}
         </ToolbarItem>
       </RouterLink>
+      <RouterLink v-slot="{ isActive }" to="/template-editor">
+        <ToolbarItem :checked="isActive">
+          {{ t('toolbar.view.templateEditor') }}
+        </ToolbarItem>
+      </RouterLink>
       <ToolbarSeparator />
       <RouterLink v-slot="{ isActive }" to="/settings">
         <ToolbarItem :checked="isActive">

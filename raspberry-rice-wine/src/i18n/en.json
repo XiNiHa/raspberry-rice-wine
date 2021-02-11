@@ -14,6 +14,7 @@
     "view": {
       "title": "View",
       "scriptEditor": "Script Editor",
+      "templateEditor": "Template Editor",
       "settings": "Settings"
     }
   },
@@ -24,6 +25,17 @@
   "scriptList": {
     "title": "Script List",
     "emptyScript": "Empty Script"
+  },
+  "layerEditor": {
+    "title": "Layer Editor",
+    "noLayerSelected": "Select a layer to edit",
+    "textboxPlaceholder": "Text goes here"
+  },
+  "templateList": {
+    "title": "Template List"
+  },
+  "layerList": {
+    "title": "Layer List"
   },
   "settings": {
     "hotkey": "Hotkeys",

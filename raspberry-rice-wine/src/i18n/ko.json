@@ -14,6 +14,7 @@
     "view": {
       "title": "보기",
       "scriptEditor": "스크립트 편집기",
+      "templateEditor": "템플릿 편집기",
       "settings": "설정"
     }
   },
@@ -24,6 +25,17 @@
   "scriptList": {
     "title": "스크립트 목록",
     "emptyScript": "빈 스크립트"
+  },
+  "layerEditor": {
+    "title": "레이어 편집기",
+    "noLayerSelected": "편집할 레이어를 선택하세요",
+    "textboxPlaceholder": "여기에 텍스트가 들어갑니다"
+  },
+  "templateList": {
+    "title": "템플릿 목록"
+  },
+  "layerList": {
+    "title": "레이어 목록"
   },
   "settings": {
     "hotkey": "단축키",
