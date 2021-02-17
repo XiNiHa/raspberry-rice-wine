@@ -18,6 +18,12 @@
       "settings": "설정"
     }
   },
+  "layerComponents": {
+    "background": {
+      "title": "배경",
+      "color": "색상"
+    }
+  },
   "scriptEditor": {
     "title": "스크립트 편집기",
     "newFieldName": "새 필드"
