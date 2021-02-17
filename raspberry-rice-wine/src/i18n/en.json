@@ -26,10 +26,13 @@
     "title": "Script List",
     "emptyScript": "Empty Script"
   },
-  "layerEditor": {
-    "title": "Layer Editor",
+  "layerPreview": {
+    "title": "Layer Preview",
     "noLayerSelected": "Select a layer to edit",
     "textboxPlaceholder": "Text goes here"
+  },
+  "layerEditor": {
+    "title": "Layer Editor"
   },
   "templateList": {
     "title": "Template List"

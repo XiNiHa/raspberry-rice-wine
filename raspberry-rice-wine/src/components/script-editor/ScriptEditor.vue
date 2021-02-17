@@ -1,12 +1,12 @@
 <template>
-  <table class="w-full my-4">
+  <table v-if="selectedScript" class="w-full my-4">
     <colgroup>
       <col class="w-1/3">
       <col>
       <col>
     </colgroup>
     <tr
-      v-for="(field, i) in state.script.fields"
+      v-for="(field, i) in selectedScript.fields"
       :key="i"
       class="items-center">
       <td class="px-2">
@@ -14,18 +14,16 @@
           v-model="field.name"
           class="text-white py-1 text-right bg-transparent text-lg w-full"
           type="text"
-          :tabindex="-1"
-          @blur="emitModel">
+          :tabindex="-1">
       </td>
       <td>
         <input
           v-model="field.value"
           class="my-1 p-2 rounded-md border-2 border-gray-500 w-full"
-          type="text"
-          @blur="emitModel">
+          type="text">
       </td>
       <td>
-        <button class="mx-2 px-2" @click="removeField(i)">
+        <button class="mx-2 px-2" @click="removeField(field)">
           <i class="fas fa-trash-alt text-red-600" />
         </button>
       </td>
@@ -45,50 +43,32 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, reactive, watch } from 'vue'
+import { computed, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useHotkey } from 'vue-use-hotkey'
 import { useStore } from 'vuex'
-import { Script } from '@/common/script'
 import { State } from '@/store'
+import { Field } from '@/common/script'
 
 export default defineComponent({
-  props: {
-    modelValue: {
-      type: Object as PropType<Script>,
-      default: null
-    }
-  },
-  emits: ['update:modelValue'],
-  setup (props, { emit }) {
+  setup () {
     const { t } = useI18n()
     const store = useStore<State>()
 
-    const copyFrom = (script: Script) => ({
-      ...script,
-      fields: [...script.fields]
-    })
-
-    const state = reactive({
-      script: copyFrom(props.modelValue)
-    })
-
-    watch(() => props.modelValue, (v) => {
-      state.script = copyFrom(v)
-    })
-
-    const emitModel = () => emit('update:modelValue', state.script)
+    const selectedScript = computed(() => store.state.currentFile.selectedScript)
 
     const addField = () => {
-      state.script.fields.push({
+      const _ = selectedScript.value?.fields.push({
         name: t('scriptEditor.newFieldName'),
         value: ''
       })
-      emitModel()
     }
 
-    const removeField = (index: number) => {
-      state.script.fields.splice(index, 1)
+    const removeField = (field: Field) => {
+      const index = selectedScript.value?.fields.indexOf(field) ?? -1
+      if (index !== -1) {
+        const _ = selectedScript.value?.fields.splice(index, 1)
+      }
     }
 
     useHotkey([
@@ -99,7 +79,7 @@ export default defineComponent({
       }
     ])
 
-    return { t, state, addField, removeField, emitModel }
+    return { t, store, selectedScript, addField, removeField }
   }
 })
 </script>

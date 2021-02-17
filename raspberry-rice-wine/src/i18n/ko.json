@@ -26,10 +26,14 @@
     "title": "스크립트 목록",
     "emptyScript": "빈 스크립트"
   },
-  "layerEditor": {
-    "title": "레이어 편집기",
+  "layerPreview": {
+    "title": "레이어 미리보기",
     "noLayerSelected": "편집할 레이어를 선택하세요",
     "textboxPlaceholder": "여기에 텍스트가 들어갑니다"
+  },
+  "layerEditor": {
+    "title": "레이어 편집기",
+    "layerName": "레이어 이름"
   },
   "templateList": {
     "title": "템플릿 목록"

@@ -6,7 +6,3 @@ export interface Field {
 export interface Script {
   fields: Field[];
 }
-
-export interface ScriptSet {
-  scripts: Script[];
-}

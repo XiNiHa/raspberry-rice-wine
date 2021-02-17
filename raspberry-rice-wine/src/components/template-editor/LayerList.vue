@@ -1,23 +1,21 @@
 <script lang="tsx">
+import { computed, defineComponent, reactive } from 'vue'
+import { useStore } from 'vuex'
+import { Mutations, State } from '@/store'
 import { Layer } from '@/common/template'
-import { defineComponent, PropType, reactive } from 'vue'
 
 export default defineComponent({
-  props: {
-    layers: {
-      type: Array as PropType<Layer[]>,
-      default: () => []
-    },
-    selectedLayer: {
-      type: Object as PropType<Layer>,
-      default: () => null
-    }
-  },
-  emits: ['select'],
-  setup (props, { emit }) {
+  setup () {
+    const store = useStore<State>()
+
     const state = reactive({
       openedLayers: [] as Layer[]
     })
+
+    const layers = computed(() => store.state.currentFile.selectedTemplate?.layers)
+    const selectedLayer = computed(() => store.state.currentFile.selectedLayer)
+
+    const selectLayer = (target: Layer) => { store.commit(Mutations.SelectLayer, { target }) }
 
     const toggleOpen = (layer: Layer) => {
       const index = state.openedLayers.indexOf(layer)
@@ -33,7 +31,7 @@ export default defineComponent({
       const getLayerItem = (layer: Layer, parentArr: Layer[], indent = 0) => {
         return (
           <li>
-            <div class={'flex select-none w-full pr-2 hover:bg-gray-500 ' + (props.selectedLayer === layer ? 'bg-gray-500' : undefined)} onClick={() => emit('select', layer)}>
+            <div class={'flex select-none w-full pr-2 hover:bg-gray-500 ' + (selectedLayer.value === layer ? 'bg-gray-500' : undefined)} onClick={() => selectLayer(layer)}>
               <div style={{ width: `${24 * indent}px` }} />
               {
                 layer.children?.length
@@ -71,7 +69,7 @@ export default defineComponent({
       }
 
       return <ol class="w-full">
-        { props.layers.map((layer) => getLayerItem(layer, props.layers)) }
+        { layers.value?.map((layer) => layers.value && getLayerItem(layer, layers.value)) }
       </ol>
     }
   }
