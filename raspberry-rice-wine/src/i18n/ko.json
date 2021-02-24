@@ -21,7 +21,54 @@
   "layerComponents": {
     "background": {
       "title": "배경",
-      "color": "색상"
+      "props": {
+        "color": {
+          "title": "색상"
+        }
+      }
+    },
+    "flex": {
+      "title": "플렉스박스",
+      "props": {
+        "direction": {
+          "title": "방향"
+        },
+        "alignItems": {
+          "title": "교차 축 정렬"
+        },
+        "justifyContent": {
+          "title": "기본 축 정렬"
+        }
+      }
+    },
+    "spacing": {
+      "title": "여백",
+      "props": {
+        "marginLeft": {
+          "title": "좌측 외부 여백"
+        },
+        "marginRight": {
+          "title": "우측 외부 여백"
+        },
+        "marginTop": {
+          "title": "상단 외부 여백"
+        },
+        "marginBottom": {
+          "title": "하단 외부 여백"
+        },
+        "paddingLeft": {
+          "title": "좌측 내부 여백"
+        },
+        "paddingRight": {
+          "title": "우측 내부 여백"
+        },
+        "paddingTop": {
+          "title": "상단 내부 여백"
+        },
+        "paddingBottom": {
+          "title": "하단 내부 여백"
+        }
+      }
     }
   },
   "scriptEditor": {
@@ -39,7 +86,8 @@
   },
   "layerEditor": {
     "title": "레이어 편집기",
-    "layerName": "레이어 이름"
+    "layerName": "레이어 이름",
+    "isTextbox": "텍스트 상자로 작동"
   },
   "templateList": {
     "title": "템플릿 목록"

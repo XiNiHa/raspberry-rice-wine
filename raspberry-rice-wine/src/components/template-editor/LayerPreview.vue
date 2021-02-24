@@ -3,7 +3,7 @@ import { computed, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
 import { State } from '@/store'
-import { Layer, LayerComponents } from '@/common/template'
+import { ComponentName, Layer, LayerComponents } from '@/common/template'
 
 export default defineComponent({
   setup () {
@@ -18,10 +18,12 @@ export default defineComponent({
 
         if (layer.props) {
           for (const [componentName, props] of Object.entries(layer.props)) {
-            const result = LayerComponents[componentName](props)
+            const result = props && (LayerComponents[componentName as ComponentName].transformer as (props: any) => Record<keyof CSSStyleDeclaration, string>)(props)
             if (result) {
               for (const [key, value] of Object.entries(result)) {
-                styleObj[key] = value
+                if (value) {
+                  styleObj[key] = value.toString()
+                }
               }
             }
           }

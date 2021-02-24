@@ -18,6 +18,59 @@
       "settings": "Settings"
     }
   },
+  "layerComponents": {
+    "background": {
+      "title": "Background",
+      "props": {
+        "color": {
+          "title": "Color"
+        }
+      }
+    },
+    "flex": {
+      "title": "Flexbox",
+      "props": {
+        "direction": {
+          "title": "Direction"
+        },
+        "alignItems": {
+          "title": "Cross-axis Alignment"
+        },
+        "justifyContent": {
+          "title": "Main Axis Alignment"
+        }
+      }
+    },
+    "spacing": {
+      "title": "Spacing",
+      "props": {
+        "marginLeft": {
+          "title": "Left Outer Space"
+        },
+        "marginRight": {
+          "title": "Right Outer Space"
+        },
+        "marginTop": {
+          "title": "Top Outer Space"
+        },
+        "marginBottom": {
+          "title": "Bottom Outer Space"
+        },
+        "paddingLeft": {
+          "title": "Left Inner Space"
+        },
+        "paddingRight": {
+          "title": "Right Inner Space"
+        },
+        "paddingTop": {
+          "title": "Top Inner Space"
+        },
+        "paddingBottom": {
+          "title": "Bottom Inner Space"
+        }
+      }
+    }
+  },
   "scriptEditor": {
     "title": "Script Editor",
     "newFieldName": "New Field"
@@ -32,7 +85,9 @@
     "textboxPlaceholder": "Text goes here"
   },
   "layerEditor": {
-    "title": "Layer Editor"
+    "title": "Layer Editor",
+    "layerName": "Layer Name",
+    "isTextbox": "Is Textbox"
   },
   "templateList": {
     "title": "Template List"
