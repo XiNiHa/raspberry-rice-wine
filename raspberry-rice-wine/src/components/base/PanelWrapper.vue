@@ -50,7 +50,10 @@ export default defineComponent({
     const cols = computed(() => insertBetween(state.colWidths, 0))
     const rows = computed(() => insertBetween(state.rowHeights, 0))
 
-    const handleResize: ResizeObserverCallback = ([el]) => {
+    const handleResize = (els: readonly ResizeObserverEntry[]) => {
+      if (els.length === 0) return
+
+      const el = els[0]
       if (state.wrapperWidth !== 0) {
         const widthFraction = el.contentRect.width / state.wrapperWidth
         state.colWidths = state.colWidths.map(i => i * widthFraction)
@@ -137,8 +140,6 @@ export default defineComponent({
     const colCount = this.state.colWidths.length
     const rowCount = this.state.rowHeights.length
 
-    const children: JSX.Element[] = []
-
     const setDrag = (drag: Tab | null, i: number, j: number) => {
       this.state.currentDrag = drag
       if (drag == null) {
@@ -151,8 +152,10 @@ export default defineComponent({
     }
 
     const getEdge = (type: EdgeDragType, rowIndex: number, colIndex: number) => {
-      const cursor = type === EdgeDragType.Row ? 'row-resize'
-        : type === EdgeDragType.Column ? 'col-resize'
+      const cursor = type === EdgeDragType.Row
+        ? 'row-resize'
+        : type === EdgeDragType.Column
+          ? 'col-resize'
           : 'move'
 
       return <div class="bg-black relative">
@@ -163,6 +166,8 @@ export default defineComponent({
         }} />
       </div>
     }
+
+    const children: ReturnType<typeof getEdge>[] = []
 
     for (let i = 0; i < rowCount; i++) {
       for (let j = 0; j < colCount; j++) {

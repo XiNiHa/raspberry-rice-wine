@@ -4,6 +4,12 @@ import { File } from '@/common/file'
 import { Script } from '@/common/script'
 import { Layer, Template } from '@/common/template'
 
+interface FileEditState {
+  selectedScript: Script | null;
+  selectedTemplate: Template | null;
+  selectedLayer: Layer | null;
+}
+
 const state = {
   currentFile: {
     scripts: [
@@ -82,12 +88,6 @@ const state = {
 }
 
 export type State = typeof state
-
-interface FileEditState {
-  selectedScript: Script | null;
-  selectedTemplate: Template | null;
-  selectedLayer: Layer | null;
-}
 
 export const enum Mutations {
   AddScript = 'add-script',

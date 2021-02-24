@@ -45,7 +45,7 @@ export default defineComponent({
       const listeners = {} as Record<string, (e: any) => unknown>
 
       // eslint-disable-next-line prefer-const
-      let timeout: NodeJS.Timeout
+      let timeout: ReturnType<typeof setTimeout>
       let completed = false
 
       const cleanup = () => {
