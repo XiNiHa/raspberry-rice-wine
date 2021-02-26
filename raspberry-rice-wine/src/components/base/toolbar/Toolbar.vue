@@ -8,6 +8,10 @@
       @close-items="closeItems">
       <ToolbarItem>{{ t('toolbar.file.newFile') }}</ToolbarItem>
       <ToolbarItem>{{ t('toolbar.file.openFile') }}</ToolbarItem>
+      <ToolbarSeparator />
+      <ToolbarItem @click="store.state.activeModal = 'exportOption'">
+        {{ t('toolbar.file.export') }}
+      </ToolbarItem>
     </ToolbarSection>
     <ToolbarSection
       :title="t('toolbar.view.title')"
@@ -37,15 +41,18 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useStore } from 'vuex'
+import { State } from '@/store'
 import ToolbarSection from './ToolbarSection.vue'
 import ToolbarItem from './ToolbarItem.vue'
 import ToolbarSeparator from './ToolbarSeparator.vue'
-import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
   components: { ToolbarSection, ToolbarItem, ToolbarSeparator },
   setup () {
     const { t } = useI18n()
+    const store = useStore<State>()
 
     const active = ref(-1)
     const lock = ref(false)
@@ -86,7 +93,7 @@ export default defineComponent({
       setTimeout(() => { lock.value = false }, 500)
     }
 
-    return { t, active, clickActivate, hoverActivate, closeItems }
+    return { t, store, active, clickActivate, hoverActivate, closeItems }
   }
 })
 </script>

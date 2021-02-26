@@ -1,4 +1,4 @@
-export function insertBetween<T> (arr: T[], value: T) {
+export function insertBetween<T> (arr: T[], value: T): T[] {
   const result: T[] = []
 
   for (let i = 0; i < arr.length; i++) {

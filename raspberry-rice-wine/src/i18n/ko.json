@@ -9,7 +9,8 @@
     "file": {
       "title": "파일",
       "newFile": "새 파일",
-      "openFile": "열기"
+      "openFile": "열기",
+      "export": "내보내기"
     },
     "view": {
       "title": "보기",
@@ -72,12 +73,16 @@
     }
   },
   "scriptEditor": {
-    "title": "스크립트 편집기",
+    "title": "스크립트 편집",
     "newFieldName": "새 필드"
   },
   "scriptList": {
     "title": "스크립트 목록",
     "emptyScript": "빈 스크립트"
+  },
+  "scriptMapper": {
+    "title": "스크립트 연결",
+    "template": "템플릿"
   },
   "layerPreview": {
     "title": "레이어 미리보기",
@@ -85,7 +90,7 @@
     "textboxPlaceholder": "여기에 텍스트가 들어갑니다"
   },
   "layerEditor": {
-    "title": "레이어 편집기",
+    "title": "레이어 편집",
     "layerName": "레이어 이름",
     "isTextbox": "텍스트 상자로 작동"
   },
@@ -104,5 +109,16 @@
       "title": "스크립트 편집기",
       "newField": "새 필드 만들기"
     }
+  },
+  "exportOptionModal": {
+    "title": "내보내기",
+    "targetDirectory": "내보낼 폴더",
+    "directoryInputPlaceholder": "폴더를 선택하려면 클릭하세요...",
+    "nameFormat": "파일 이름 형식",
+    "badge": {
+      "year": "연도",
+      "scriptIndex": "스크립트 번호"
+    },
+    "export": "내보내기"
   }
 }

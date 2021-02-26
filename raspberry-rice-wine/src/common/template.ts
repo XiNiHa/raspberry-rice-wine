@@ -96,7 +96,7 @@ export interface Template {
   layers: Layer[];
 }
 
-export function getTextboxes (layers: Layer[]) {
+export function getTextboxes (layers: Layer[]): Layer[] {
   const result = []
 
   for (const layer of layers) {

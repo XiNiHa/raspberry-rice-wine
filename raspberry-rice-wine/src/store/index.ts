@@ -18,36 +18,27 @@ const state = {
           {
             name: 'Main Text',
             value: 'Hello, World!'
-          },
-          {
-            name: 'Speaker',
-            value: 'XiNiHa'
           }
-        ]
+        ],
+        mappings: {}
       },
       {
         fields: [
           {
             name: 'Main Text',
-            value: 'Hello, World!'
-          },
-          {
-            name: 'Speaker',
-            value: 'XiNiHa'
+            value: 'The second title'
           }
-        ]
+        ],
+        mappings: {}
       },
       {
         fields: [
           {
             name: 'Main Text',
-            value: 'Hello, World!'
-          },
-          {
-            name: 'Speaker',
-            value: 'XiNiHa'
+            value: 'Unicode Test: 유니코드 테스트'
           }
-        ]
+        ],
+        mappings: {}
       }
     ],
     templates: [
@@ -65,7 +56,7 @@ const state = {
             ],
             props: {
               background: {
-                color: Color.rgb(200, 40, 40)
+                color: Color.rgb(200, 40, 40).alpha(0.8)
               }
             },
             plainStyles: {
@@ -84,6 +75,11 @@ const state = {
     scriptEditor: {
       newField: new Set(['Shift', '+'])
     }
+  },
+  activeModal: '',
+  exportData: {
+    targetDir: '',
+    formatter: null as ((scriptIndex: number) => string) | null
   }
 }
 
@@ -104,11 +100,13 @@ export default createStore({
   state,
   mutations: {
     [Mutations.AddScript] (state) {
+      const from = state.currentFile.scripts[state.currentFile.scripts.length - 1]
       state.currentFile.scripts.push({
-        fields: state.currentFile.scripts[state.currentFile.scripts.length - 1].fields.map(field => ({
+        fields: from.fields.map(field => ({
           name: field.name,
           value: ''
-        }))
+        })),
+        mappings: { ...from.mappings }
       })
     },
     [Mutations.RemoveScript] (state, payload: { script: Script }) {

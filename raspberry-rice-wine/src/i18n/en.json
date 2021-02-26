@@ -9,7 +9,8 @@
     "file": {
       "title": "File",
       "newFile": "New File",
-      "openFile": "Open"
+      "openFile": "Open",
+      "export": "Export"
     },
     "view": {
       "title": "View",
@@ -72,12 +73,16 @@
     }
   },
   "scriptEditor": {
-    "title": "Script Editor",
+    "title": "Edit Script",
     "newFieldName": "New Field"
   },
   "scriptList": {
     "title": "Script List",
     "emptyScript": "Empty Script"
+  },
+  "scriptMapper": {
+    "title": "Map Script",
+    "template": "Template"
   },
   "layerPreview": {
     "title": "Layer Preview",
@@ -85,7 +90,7 @@
     "textboxPlaceholder": "Text goes here"
   },
   "layerEditor": {
-    "title": "Layer Editor",
+    "title": "Edit Layer",
     "layerName": "Layer Name",
     "isTextbox": "Is Textbox"
   },
@@ -104,5 +109,16 @@
       "title": "Script Editor",
       "newField": "Create New Field"
     }
+  },
+  "exportOptionModal": {
+    "title": "Export",
+    "targetDirectory": "Output Directory",
+    "directoryInputPlaceholder": "Click to open the file dialog...",
+    "nameFormat": "File Name Format",
+    "badge": {
+      "year": "Year",
+      "scriptIndex": "Script Index"
+    },
+    "export": "Export"
   }
 }

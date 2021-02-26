@@ -8,4 +8,5 @@ export interface Field {
 export interface Script {
   fields: Field[];
   template?: Template;
+  mappings: Record<string, string>;
 }

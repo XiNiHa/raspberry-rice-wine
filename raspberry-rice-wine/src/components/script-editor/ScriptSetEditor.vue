@@ -12,6 +12,11 @@
         key="ScriptEditor"
         :title="t('scriptEditor.title')" />
     </template>
+    <template #1-0>
+      <ScriptMapper
+        key="ScriptMapper"
+        :title="t('scriptMapper.title')" />
+    </template>
   </PanelWrapper>
 </template>
 
@@ -21,9 +26,10 @@ import { useI18n } from 'vue-i18n'
 import PanelWrapper from '../base/PanelWrapper.vue'
 import ScriptList from './ScriptList.vue'
 import ScriptEditor from './ScriptEditor.vue'
+import ScriptMapper from './ScriptMapper.vue'
 
 export default defineComponent({
-  components: { PanelWrapper, ScriptList, ScriptEditor },
+  components: { PanelWrapper, ScriptList, ScriptEditor, ScriptMapper },
   setup () {
     const { t } = useI18n()
 
