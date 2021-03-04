@@ -86,7 +86,7 @@
   },
   "layerPreview": {
     "title": "Layer Preview",
-    "noLayerSelected": "Select a layer to edit",
+    "noRootSelected": "Select a target to edit",
     "textboxPlaceholder": "Text goes here"
   },
   "layerEditor": {

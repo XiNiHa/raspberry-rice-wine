@@ -86,7 +86,7 @@
   },
   "layerPreview": {
     "title": "레이어 미리보기",
-    "noLayerSelected": "편집할 레이어를 선택하세요",
+    "noRootSelected": "편집할 대상을 선택하세요",
     "textboxPlaceholder": "여기에 텍스트가 들어갑니다"
   },
   "layerEditor": {

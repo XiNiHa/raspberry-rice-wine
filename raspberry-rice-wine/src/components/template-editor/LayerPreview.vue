@@ -1,8 +1,8 @@
 <template>
   <div class="w-full h-full flex justify-center items-center">
-    <Renderer v-if="layer" :root="layer" />
+    <Renderer v-if="root" :root="root" />
     <span v-else class="select-none text-gray-300">
-      {{ t('layerPreview.noLayerSelected') }}
+      {{ t('layerPreview.noRootSelected') }}
     </span>
   </div>
 </template>
@@ -20,9 +20,9 @@ export default defineComponent({
     const { t } = useI18n()
     const store = useStore<State>()
 
-    const layer = computed(() => store.state.currentFile.selectedLayer)
+    const root = computed(() => store.state.currentFile.selectedLayer ?? store.state.currentFile.selectedTemplate)
 
-    return { t, layer }
+    return { t, root }
   }
 })
 </script>
