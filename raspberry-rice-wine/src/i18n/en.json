@@ -98,7 +98,8 @@
     "title": "Template List"
   },
   "layerList": {
-    "title": "Layer List"
+    "title": "Layer List",
+    "newLayer": "New Layer"
   },
   "settings": {
     "hotkey": "Hotkeys",
