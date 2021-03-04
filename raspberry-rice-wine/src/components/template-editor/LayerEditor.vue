@@ -17,7 +17,7 @@ export default defineComponent({
       .filter(name => !layer.value?.props || !Object.keys(layer.value.props).includes(name)) as ComponentName[])
 
     const compNameToAdd = ref<ComponentName | null>(notInComps.value[0])
-    watch(() => notInComps, () => { compNameToAdd.value = notInComps.value[0] })
+    watch(() => notInComps.value, (v) => { compNameToAdd.value = v[0] })
 
     return () => {
       if (!layer.value) return <div />
