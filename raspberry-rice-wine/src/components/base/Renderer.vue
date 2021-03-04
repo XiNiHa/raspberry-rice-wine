@@ -50,7 +50,13 @@ export default defineComponent({
 
       if (props.root) {
         if ('layers' in props.root) {
-          return <>{props.root.layers.map(layer => renderLayer(layer))}</>
+          return <>{props.root.layers.map(layer => {
+            return <div style="position: absolute; left: 50%">
+              <div style="position: relative; left: -50%">
+                {renderLayer(layer)}
+              </div>
+            </div>
+          })}</>
         } else {
           return <>{renderLayer(props.root)}</>
         }
