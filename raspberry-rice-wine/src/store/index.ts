@@ -80,7 +80,9 @@ const state = {
   exportData: {
     targetDir: '',
     formatter: null as ((scriptIndex: number) => string) | null
-  }
+  },
+  colorPickerTarget: null as Color | null,
+  colorPickerCallback: null as ((c: Color) => void)| null
 }
 
 export type State = typeof state

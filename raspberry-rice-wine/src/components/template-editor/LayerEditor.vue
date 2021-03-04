@@ -33,29 +33,18 @@ export default defineComponent({
           inputElement = <input type="checkbox" checked={value} onChange={e => onInput((e.target as HTMLInputElement).checked)} />
         } else if (typeof value === 'object') {
           if (value instanceof Color) {
-            let r = value.red()
-            let g = value.green()
-            let b = value.blue()
-            let a = value.alpha()
-
-            inputElement = <>
-              <input type="number" class="ml-3 p-1 text-right rounded border border-gray-600 flex-grow min-w-min" value={r} min={0} max={255} onInput={e => {
-                r = parseFloat((e.target as HTMLInputElement).value)
-                onInput(Color.rgb(r, g, b).alpha(a))
-              }} />
-              <input type="number" class="ml-1 p-1 text-right rounded border border-gray-600 flex-grow min-w-min" value={g} min={0} max={255} onInput={e => {
-                g = parseFloat((e.target as HTMLInputElement).value)
-                onInput(Color.rgb(r, g, b).alpha(a))
-              }} />
-              <input type="number" class="ml-1 p-1 text-right rounded border border-gray-600 flex-grow min-w-min" value={b} min={0} max={255} onInput={e => {
-                b = parseFloat((e.target as HTMLInputElement).value)
-                onInput(Color.rgb(r, g, b).alpha(a))
-              }} />
-              <input type="number" class="ml-1 p-1 text-right rounded border border-gray-600 flex-grow min-w-min" value={a} min={0} max={1} step={0.1} onInput={e => {
-                a = parseFloat((e.target as HTMLInputElement).value)
-                onInput(Color.rgb(r, g, b).alpha(a))
-              }} />
-            </>
+            inputElement = (
+              <button
+                class="flex-grow h-8 mx-2 rounded border-2 border-gray-600 focus:outline-none"
+                style="background: linear-gradient(45deg, #ccc 25%, transparent 25%),linear-gradient(-45deg, #ccc 25%, transparent 25%),linear-gradient(45deg, transparent 75%, #ccc 75%),linear-gradient(-45deg, transparent 75%, #ccc 75%); background-size: 16px 16px; background-position: 0 0, 0 8px, 8px -8px, -8px 0px;"
+                onClick={() => {
+                  store.state.colorPickerTarget = value
+                  store.state.colorPickerCallback = onInput
+                  store.state.activeModal = 'colorPicker'
+                }}>
+                <div class="w-full h-full" style={{ backgroundColor: value.toString() }} />
+              </button>
+            )
           }
         }
 
