@@ -3,10 +3,12 @@ import { computed, defineComponent, reactive } from 'vue'
 import { useStore } from 'vuex'
 import { Mutations, State } from '@/store'
 import { Layer } from '@/common/template'
+import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
   setup () {
     const store = useStore<State>()
+    const { t } = useI18n()
 
     const state = reactive({
       openedLayers: [] as Layer[]
@@ -70,6 +72,17 @@ export default defineComponent({
 
       return <ol class="w-full">
         { layers.value?.map((layer) => layers.value && getLayerItem(layer, layers.value)) }
+        <li class="text-center text-white select-none w-full hover:bg-gray-500" onClick={() => {
+          layers.value?.push({
+            name: t('layerList.newLayer'),
+            isTextbox: false,
+            children: [],
+            props: {},
+            plainStyles: {}
+          })
+        }}>
+          <i class="fas fa-plus" />
+        </li>
       </ol>
     }
   }
