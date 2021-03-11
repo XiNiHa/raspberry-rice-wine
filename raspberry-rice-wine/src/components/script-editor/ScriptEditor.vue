@@ -1,26 +1,28 @@
 <template>
-  <table v-if="selectedScript" class="w-full my-4">
+  <table v-if="selectedScript.length > 0" class="w-full my-4">
     <colgroup>
       <col class="w-1/3">
       <col>
       <col>
     </colgroup>
     <tr
-      v-for="(field, i) in selectedScript.fields"
+      v-for="(field, i) in overlapFields"
       :key="i"
       class="items-center">
       <td class="px-2">
         <input
-          v-model="field.name"
+          :value="field.name"
           class="text-white py-1 text-right bg-transparent text-lg w-full"
           type="text"
-          :tabindex="-1">
+          :tabindex="-1"
+          @input="updateName(field.name, $event)">
       </td>
       <td>
         <input
-          v-model="field.value"
+          :value="field.value"
           class="my-1 p-2 rounded-md border-2 border-gray-500 w-full"
-          type="text">
+          type="text"
+          @input="updateValue(field.name, $event)">
       </td>
       <td>
         <button class="mx-2 px-2" @click="removeField(field)">
@@ -43,11 +45,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useHotkey } from 'vue-use-hotkey'
 import { useStore } from 'vuex'
-import { State } from '@/store'
+import { getSelectedScripts, State } from '@/store'
 import { Field } from '@/common/script'
 
 export default defineComponent({
@@ -55,19 +57,83 @@ export default defineComponent({
     const { t } = useI18n()
     const store = useStore<State>()
 
-    const selectedScript = computed(() => store.state.currentFile.selectedScript)
+    const overlapFields = ref<Field[]>([])
+
+    const selectedScript = computed(() => getSelectedScripts(store.state))
+
+    watch(() => selectedScript.value, (v) => {
+      const newOverlapFields: Field[] = []
+      for (let i = 0; i < v.length; i++) {
+        if (i === 0) {
+          v[i].fields.forEach(field => newOverlapFields.push({
+            name: field.name,
+            value: field.value
+          }))
+        } else {
+          for (let j = 0; j < newOverlapFields.length; j++) {
+            const found = v[i].fields
+              .filter(f => f.name === newOverlapFields[j].name &&
+                f.value === newOverlapFields[j].value).length > 0
+
+            if (!found) {
+              newOverlapFields.splice(j, 1)
+              j--
+              if (newOverlapFields.length === 0) {
+                break
+              }
+            }
+          }
+        }
+      }
+
+      overlapFields.value = newOverlapFields
+    }, { immediate: true, deep: true })
 
     const addField = () => {
-      const _ = selectedScript.value?.fields.push({
-        name: t('scriptEditor.newFieldName'),
-        value: ''
-      })
+      selectedScript.value
+        .forEach(script => script.fields.push({
+          name: t('scriptEditor.newFieldName'),
+          value: ''
+        }))
     }
 
     const removeField = (field: Field) => {
-      const index = selectedScript.value?.fields.indexOf(field) ?? -1
-      if (index !== -1) {
-        const _ = selectedScript.value?.fields.splice(index, 1)
+      selectedScript.value.forEach(script => {
+        const sameName = script.fields.filter(f => f.name === field.name)[0]
+        const index = (sameName && script.fields.indexOf(sameName)) ?? -1
+        if (index !== -1) {
+          script.fields.splice(index, 1)
+        }
+      })
+    }
+
+    const updateName = (origName: string, e: InputEvent) => {
+      const field = overlapFields.value.find(field => field.name === origName)
+      if (field) {
+        field.name = (e.target as HTMLInputElement).value
+
+        selectedScript.value.forEach(script => {
+          const f = script.fields.find(f => f.name === origName)
+
+          if (f) {
+            f.name = field.name
+          }
+        })
+      }
+    }
+
+    const updateValue = (name: string, e: InputEvent) => {
+      const field = overlapFields.value.find(field => field.name === name)
+      if (field) {
+        field.value = (e.target as HTMLInputElement).value
+
+        selectedScript.value.forEach(script => {
+          const f = script.fields.find(f => f.name === name)
+
+          if (f) {
+            f.value = field.value
+          }
+        })
       }
     }
 
@@ -79,7 +145,7 @@ export default defineComponent({
       }
     ])
 
-    return { t, store, selectedScript, addField, removeField }
+    return { t, store, selectedScript, overlapFields, addField, removeField, updateName, updateValue }
   }
 })
 </script>

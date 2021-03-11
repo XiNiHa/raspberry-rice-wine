@@ -4,9 +4,12 @@
       v-for="(script, i) in scripts"
       :key="i"
       class="flex justify-between select-none w-full px-2 hover:bg-gray-500"
-      :class="{'bg-gray-500': script === selectedScript}"
+      :class="{
+        'bg-gray-500': script === selectedScript.anchor,
+        'bg-gray-600': selectedScript.rest?.includes(script)
+      }"
       draggable="true"
-      @click="selectScript(script)"
+      @click="selectScript(script, $event)"
       @dragstart.stop="setDrag(script)"
       @dragover.prevent
       @drop.stop="dropAt(i)">
@@ -48,7 +51,12 @@ export default defineComponent({
 
     const addScript = () => { store.commit(Mutations.AddScript) }
     const removeScript = (script: Script) => { store.commit(Mutations.RemoveScript, { script }) }
-    const selectScript = (target: Script) => { store.commit(Mutations.SelectScript, { target }) }
+    const selectScript = (target: Script, e: MouseEvent) => {
+      store.commit(Mutations.SelectScript, {
+        target,
+        multiSelect: e.shiftKey
+      })
+    }
 
     const setDrag = (script: Script) => { drag.value = script }
     const dropAt = (index: number) => {
