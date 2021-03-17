@@ -84,6 +84,9 @@
     "title": "Map Script",
     "template": "Template"
   },
+  "scriptPreview": {
+    "title": "Script Preview"
+  },
   "layerPreview": {
     "title": "Layer Preview",
     "noRootSelected": "Select a target to edit",
