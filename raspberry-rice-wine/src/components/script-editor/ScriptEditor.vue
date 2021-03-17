@@ -57,12 +57,12 @@ export default defineComponent({
     const { t } = useI18n()
     const store = useStore<State>()
 
-    const overlapFields = ref<Field[]>([])
+    const overlapFields = ref<{ name: string; value: string | null }[]>([])
 
     const selectedScript = computed(() => getSelectedScripts(store.state))
 
     watch(() => selectedScript.value, (v) => {
-      const newOverlapFields: Field[] = []
+      const newOverlapFields: { name: string; value: string | null }[] = []
       for (let i = 0; i < v.length; i++) {
         if (i === 0) {
           v[i].fields.forEach(field => newOverlapFields.push({
@@ -72,15 +72,16 @@ export default defineComponent({
         } else {
           for (let j = 0; j < newOverlapFields.length; j++) {
             const found = v[i].fields
-              .filter(f => f.name === newOverlapFields[j].name &&
-                f.value === newOverlapFields[j].value).length > 0
+              .filter(f => f.name === newOverlapFields[j].name)
 
-            if (!found) {
+            if (found.length <= 0) {
               newOverlapFields.splice(j, 1)
               j--
               if (newOverlapFields.length === 0) {
                 break
               }
+            } else if (found[0].value !== newOverlapFields[j].value) {
+              newOverlapFields[j].value = null
             }
           }
         }
@@ -130,7 +131,7 @@ export default defineComponent({
         selectedScript.value.forEach(script => {
           const f = script.fields.find(f => f.name === name)
 
-          if (f) {
+          if (f && field.value) {
             f.value = field.value
           }
         })
