@@ -12,7 +12,7 @@
       </span>
     </div>
     <div class="w-0 h-0 overflow-hidden">
-      <div ref="renderArea" class="flex justify-center items-center" style="width: 1920px; height: 1080px;">
+      <div ref="renderArea" class="flex justify-center items-center relative" :style="renderAreaStyles">
         <Renderer :root="currentTemplate" :textbox-mappings="textboxMappings" />
       </div>
     </div>
@@ -47,6 +47,10 @@ export default defineComponent({
           [box, currentScript.value.fields.filter(field => field.name === fieldName)[0].value])))
     const totalCount = computed(() => store.state.currentFile.scripts.length)
     const progress = computed(() => (state.currentIndex + 1) / totalCount.value * 100)
+    const renderAreaStyles = computed(() => ({
+      width: currentTemplate.value?.width + 'px',
+      height: currentTemplate.value?.height + 'px'
+    }))
 
     ;(async () => {
       for (; state.currentIndex < totalCount.value; state.currentIndex++) {
@@ -82,7 +86,7 @@ export default defineComponent({
       window.ipcRenderer.removeAllListeners('exportError')
     })
 
-    return { t, state, progress, currentTemplate, textboxMappings, renderArea, totalCount }
+    return { t, state, progress, currentTemplate, textboxMappings, renderArea, totalCount, renderAreaStyles }
   }
 })
 </script>

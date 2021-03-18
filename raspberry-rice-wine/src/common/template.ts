@@ -94,6 +94,8 @@ export interface Layer {
 export interface Template {
   name: string;
   layers: Layer[];
+  width: number;
+  height: number;
 }
 
 export function getTextboxes (layers: Layer[]): Layer[] {

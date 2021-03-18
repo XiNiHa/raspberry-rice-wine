@@ -12,6 +12,7 @@ export default defineComponent({
     const store = useStore<State>()
 
     const layer = computed(() => store.state.currentFile.selectedLayer)
+    const template = computed(() => store.state.currentFile.selectedTemplate)
 
     const notInComps = computed(() => Object.keys(LayerComponents)
       .filter(name => !layer.value?.props || !Object.keys(layer.value.props).includes(name)) as ComponentName[])
@@ -20,17 +21,15 @@ export default defineComponent({
     watch(() => notInComps.value, (v) => { compNameToAdd.value = v[0] })
 
     return () => {
-      if (!layer.value) return <div />
-
-      const row = (name: string, value: PropType, onInput: (value: PropType) => void) => {
+      function row<T extends PropType> (name: string, value: T, onInput: (value: T) => void) {
         let inputElement
 
         if (typeof value === 'string') {
-          inputElement = <input type="text" class="ml-3 px-2 py-1 flex-grow rounded border border-gray-600 min-w-min" value={value} onInput={e => onInput((e.target as HTMLInputElement).value)} />
+          inputElement = <input type="text" class="ml-3 px-2 py-1 flex-grow rounded border border-gray-600 min-w-min" value={value} onInput={e => onInput((e.target as HTMLInputElement).value as T)} />
         } else if (typeof value === 'number') {
-          inputElement = <input type="number" class="ml-3 p-1 text-right flex-grow rounded border border-gray-600 min-w-min" value={value} onInput={e => onInput(parseFloat((e.target as HTMLInputElement).value))} />
+          inputElement = <input type="number" class="ml-3 p-1 text-right flex-grow rounded border border-gray-600 min-w-min" value={value} onInput={e => onInput(parseFloat((e.target as HTMLInputElement).value) as T)} />
         } else if (typeof value === 'boolean') {
-          inputElement = <input type="checkbox" checked={value} onChange={e => onInput((e.target as HTMLInputElement).checked)} />
+          inputElement = <input type="checkbox" checked={value} onChange={e => onInput((e.target as HTMLInputElement).checked as T)} />
         } else if (typeof value === 'object') {
           if (value instanceof Color) {
             inputElement = (
@@ -39,7 +38,7 @@ export default defineComponent({
                 style="background: linear-gradient(45deg, #ccc 25%, transparent 25%),linear-gradient(-45deg, #ccc 25%, transparent 25%),linear-gradient(45deg, transparent 75%, #ccc 75%),linear-gradient(-45deg, transparent 75%, #ccc 75%); background-size: 16px 16px; background-position: 0 0, 0 8px, 8px -8px, -8px 0px;"
                 onClick={() => {
                   store.state.colorPickerTarget = value
-                  store.state.colorPickerCallback = onInput
+                  store.state.colorPickerCallback = onInput as (c: Color) => void
                   store.state.activeModal = 'colorPicker'
                 }}>
                 <div class="w-full h-full" style={{ backgroundColor: value.toString() }} />
@@ -56,9 +55,10 @@ export default defineComponent({
         )
       }
 
-      return <ul class="w-full flex flex-col py-2">
-        {row(t('layerEditor.layerName'), layer.value.name, newValue => { if (layer.value) { layer.value.name = newValue as string } })}
-        {row(t('layerEditor.isTextbox'), layer.value.isTextbox, newValue => { if (layer.value) { layer.value.isTextbox = newValue as boolean } })}
+      if (layer.value) {
+        return <ul class="w-full flex flex-col py-2">
+        {row(t('propEditor.layerName'), layer.value.name, newValue => { if (layer.value) { layer.value.name = newValue } })}
+        {row(t('propEditor.isTextbox'), layer.value.isTextbox, newValue => { if (layer.value) { layer.value.isTextbox = newValue } })}
         {
           layer.value.props && Object.entries(layer.value.props).map(([_componentName, props]) => {
             const componentName = _componentName as ComponentName
@@ -104,6 +104,15 @@ export default defineComponent({
           </button>
         </li>
       </ul>
+      } else if (template.value) {
+        return <ul class="w-full flex flex-col py-2">
+          {row(t('propEditor.templateName'), template.value.name, newValue => { if (template.value) { template.value.name = newValue } })}
+          {row(t('propEditor.templateWidth'), template.value.width, newValue => { if (template.value) { template.value.width = newValue } })}
+          {row(t('propEditor.templateHeight'), template.value.height, newValue => { if (template.value) { template.value.height = newValue } })}
+        </ul>
+      } else {
+        return <div />
+      }
     }
   }
 })

@@ -47,6 +47,8 @@ const state = {
     templates: [
       {
         name: 'New Template',
+        width: 1920,
+        height: 1080,
         layers: [
           {
             name: 'New Layer',

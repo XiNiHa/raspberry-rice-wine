@@ -92,10 +92,13 @@
     "noRootSelected": "Select a target to edit",
     "textboxPlaceholder": "Text goes here"
   },
-  "layerEditor": {
-    "title": "Edit Layer",
+  "propEditor": {
+    "title": "Edit Properties",
     "layerName": "Layer Name",
-    "isTextbox": "Is Textbox"
+    "isTextbox": "Is Textbox",
+    "templateName": "Template Name",
+    "templateWidth": "Width",
+    "templateHeight": "Height"
   },
   "templateList": {
     "title": "Template List"
@@ -124,5 +127,8 @@
       "scriptIndex": "Script Index"
     },
     "export": "Export"
+  },
+  "exportProgressModal": {
+    "title": "Export"
   }
 }

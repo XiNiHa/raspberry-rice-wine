@@ -8,9 +8,9 @@
         :title="t('layerPreview.title')" />
     </template>
     <template #0-1>
-      <LayerEditor
-        key="LayerEditor"
-        :title="t('layerEditor.title')" />
+      <PropEditor
+        key="PropEditor"
+        :title="t('propEditor.title')" />
       <TemplateList
         key="TemplateList"
         :title="t('templateList.title')" />
@@ -28,12 +28,12 @@ import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import PanelWrapper from '../base/PanelWrapper.vue'
 import LayerPreview from './LayerPreview.vue'
-import LayerEditor from './LayerEditor.vue'
+import PropEditor from './PropEditor.vue'
 import TemplateList from './TemplateList.vue'
 import LayerList from './LayerList.vue'
 
 export default defineComponent({
-  components: { PanelWrapper, LayerPreview, LayerEditor, TemplateList, LayerList },
+  components: { PanelWrapper, LayerPreview, PropEditor, TemplateList, LayerList },
   setup () {
     const { t } = useI18n()
 
