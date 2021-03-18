@@ -1,8 +1,6 @@
 <template>
   <div class="w-full h-full max-h-screen flex flex-col">
-    <Header
-      v-if="showHeader"
-      class="flex-shrink-0" />
+    <Header v-if="showHeader" />
     <RouterView class="flex-grow" />
     <ModalRenderer v-if="store.state.activeModal" class="absolute z-50 w-screen h-screen bg-black bg-opacity-50" />
   </div>
