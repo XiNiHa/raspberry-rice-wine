@@ -103,9 +103,10 @@
   "templateList": {
     "title": "템플릿 목록"
   },
-  "layerList": {
-    "title": "레이어 목록",
-    "newLayer": "새 레이어"
+  "hierarchy": {
+    "title": "계층",
+    "newLayer": "새 레이어",
+    "newTemplate": "새 템플릿"
   },
   "settings": {
     "hotkey": "단축키",

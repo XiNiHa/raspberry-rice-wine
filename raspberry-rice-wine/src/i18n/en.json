@@ -103,9 +103,10 @@
   "templateList": {
     "title": "Template List"
   },
-  "layerList": {
-    "title": "Layer List",
-    "newLayer": "New Layer"
+  "hierarchy": {
+    "title": "Hierarchy",
+    "newLayer": "New Layer",
+    "newTemplate": "New Template"
   },
   "settings": {
     "hotkey": "Hotkeys",

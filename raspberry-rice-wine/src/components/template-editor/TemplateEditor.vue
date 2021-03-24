@@ -11,14 +11,11 @@
       <PropEditor
         key="PropEditor"
         :title="t('propEditor.title')" />
-      <TemplateList
-        key="TemplateList"
-        :title="t('templateList.title')" />
     </template>
     <template #1-0>
-      <LayerList
-        key="LayerList"
-        :title="t('layerList.title')" />
+      <Hierarchy
+        key="Hierarchy"
+        :title="t('hierarchy.title')" />
     </template>
   </PanelWrapper>
 </template>
@@ -29,11 +26,10 @@ import { useI18n } from 'vue-i18n'
 import PanelWrapper from '../base/PanelWrapper.vue'
 import LayerPreview from './LayerPreview.vue'
 import PropEditor from './PropEditor.vue'
-import TemplateList from './TemplateList.vue'
-import LayerList from './LayerList.vue'
+import Hierarchy from './Hierarchy.vue'
 
 export default defineComponent({
-  components: { PanelWrapper, LayerPreview, PropEditor, TemplateList, LayerList },
+  components: { PanelWrapper, LayerPreview, PropEditor, Hierarchy },
   setup () {
     const { t } = useI18n()
 
