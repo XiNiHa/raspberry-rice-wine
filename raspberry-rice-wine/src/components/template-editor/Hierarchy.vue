@@ -11,7 +11,9 @@ export default defineComponent({
     const { t } = useI18n()
 
     const state = reactive({
-      openedItems: [] as (Template | Layer)[]
+      openedItems: [] as (Template | Layer)[],
+      drag: null as Layer | null,
+      dragParent: null as Layer[] | null
     })
 
     const templates = computed(() => store.state.currentFile.templates)
@@ -54,7 +56,6 @@ export default defineComponent({
           state.openedItems.push(selectedTemplate.value)
         }
       } else {
-        // TODO: Implement template addition
         store.state.currentFile.templates.push({
           name: t('hierarchy.newTemplate'),
           layers: [],
@@ -62,6 +63,11 @@ export default defineComponent({
           height: 1080
         })
       }
+    }
+
+    const clearSelection = () => {
+      store.state.currentFile.selectedTemplate = null
+      store.state.currentFile.selectedLayer = null
     }
 
     return () => {
@@ -76,8 +82,35 @@ export default defineComponent({
       const getLayerItem = (layer: Layer, parentArr: Layer[], indent = 0) => {
         return (
           <li>
-            <div class={'flex select-none w-full pr-2 hover:bg-gray-500 ' + (selectedLayer.value === layer ? 'bg-gray-500' : undefined)} onClick={() => selectLayer(layer)}>
-              <div style={{ width: `${24 * indent}px` }} />
+            <div
+              draggable
+              class={'flex select-none w-full pr-2 hover:bg-gray-500 ' + (selectedLayer.value === layer ? 'bg-gray-500' : undefined)}
+              onClick={() => selectLayer(layer)}
+              onDragstart={e => {
+                e.stopPropagation()
+                state.drag = layer
+                state.dragParent = parentArr
+              }}
+              onDragover={e => e.preventDefault()}
+              onDrop={e => {
+                e.stopPropagation()
+                if (state.dragParent && state.drag) {
+                  const oldIndex = state.dragParent.indexOf(state.drag)
+                  if (oldIndex !== -1) {
+                    state.dragParent.splice(oldIndex, 1)
+
+                    if (!layer.children) { layer.children = [] }
+                    layer.children.push(state.drag)
+                    if (!state.openedItems.includes(layer)) {
+                      state.openedItems.push(layer)
+                    }
+
+                    state.drag = null
+                    state.dragParent = null
+                  }
+                }
+              }}>
+              <div style={{ width: `${18 * indent}px` }} />
               {
                 layer.children?.length
                   ? getToggleButton(layer)
@@ -110,11 +143,43 @@ export default defineComponent({
       const getTemplateItem = (template: Template) => {
         return (
           <li>
-            <div class={'flex select-none w-full pr-2 hover:bg-gray-500 ' + (selectedTemplate.value === template ? 'bg-gray-500' : undefined)} onClick={() => selectTemplate(template)}>
-              { getToggleButton(template) }
+            <div
+              class={'flex select-none w-full pr-2 hover:bg-gray-500 ' + (selectedTemplate.value === template ? 'bg-gray-500' : undefined)}
+              onClick={() => selectTemplate(template)}
+              onDragover={e => e.preventDefault()}
+              onDrop={e => {
+                e.stopPropagation()
+                if (state.dragParent && state.drag) {
+                  const oldIndex = state.dragParent.indexOf(state.drag)
+                  if (oldIndex !== -1) {
+                    state.dragParent.splice(oldIndex, 1)
+                    template.layers.push(state.drag)
+                    if (!state.openedItems.includes(template)) {
+                      state.openedItems.push(template)
+                    }
+
+                    state.drag = null
+                    state.dragParent = null
+                  }
+                }
+              }}>
+              {
+                template.layers?.length
+                  ? getToggleButton(template)
+                  : <div class="w-6" />
+              }
               <span class="text-gray-200 whitespace-nowrap overflow-hidden overflow-ellipsis flex-grow">
                 { template.name }
               </span>
+              <button class="float-right px-1 focus:outline-none" onClick={(e) => {
+                e.stopPropagation()
+                const index = templates.value?.indexOf(template)
+                if (index !== -1) {
+                  templates.value?.splice(index, 1)
+                }
+              }}>
+                <i class="fas fa-times" />
+              </button>
             </div>
             {
               (state.openedItems.includes(template) && (
@@ -127,13 +192,14 @@ export default defineComponent({
         )
       }
 
-      return <ol class="w-full">
+      return <ol class="w-full h-full flex flex-col">
         {
           templates.value.map(getTemplateItem)
         }
         <li class="text-center text-white select-none w-full hover:bg-gray-500" onClick={add}>
           <i class="fas fa-plus" />
         </li>
+        <div class="w-full flex-grow" onClick={clearSelection} />
       </ol>
     }
   }
