@@ -10,6 +10,7 @@
       "title": "File",
       "newFile": "New File",
       "openFile": "Open",
+      "importScript": "Import Script",
       "export": "Export"
     },
     "view": {
@@ -131,5 +132,11 @@
   },
   "exportProgressModal": {
     "title": "Export"
+  },
+  "importScriptModal": {
+    "title": "Import Script",
+    "fields": "Fields",
+    "pattern": "Pattern",
+    "import": "Import"
   }
 }

@@ -10,6 +10,7 @@
 import { computed, defineComponent, shallowRef } from 'vue'
 import { useStore } from 'vuex'
 import { State } from '@/store'
+import ImportScriptModal from './ImportScriptModal.vue'
 import ExportOptionModal from './ExportOptionModal.vue'
 import ExportProgressModal from './ExportProgressModal.vue'
 import ColorPickerModal from './ColorPickerModal.vue'
@@ -19,6 +20,7 @@ export default defineComponent({
     const store = useStore<State>()
 
     const modalMap = shallowRef({
+      importScript: ImportScriptModal,
       exportOption: ExportOptionModal,
       exportProgress: ExportProgressModal,
       colorPicker: ColorPickerModal

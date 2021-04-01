@@ -9,6 +9,9 @@
       <ToolbarItem>{{ t('toolbar.file.newFile') }}</ToolbarItem>
       <ToolbarItem>{{ t('toolbar.file.openFile') }}</ToolbarItem>
       <ToolbarSeparator />
+      <ToolbarItem @click="importScript">
+        {{ t('toolbar.file.importScript') }}
+      </ToolbarItem>
       <ToolbarItem @click="store.state.activeModal = 'exportOption'">
         {{ t('toolbar.file.export') }}
       </ToolbarItem>
@@ -93,7 +96,25 @@ export default defineComponent({
       setTimeout(() => { lock.value = false }, 500)
     }
 
-    return { t, store, active, clickActivate, hoverActivate, closeItems }
+    const importScript = () => {
+      const fileInput = document.createElement('input')
+      fileInput.setAttribute('type', 'file')
+      fileInput.setAttribute('accept', '.txt')
+      fileInput.addEventListener('input', () => {
+        if (fileInput.files) {
+          window.ipcRenderer.on('readCompleted', (e, content) => {
+            store.state.importText = content
+            store.state.activeModal = 'importScript'
+          })
+          window.ipcRenderer.send('read', {
+            path: fileInput.files[0].path
+          })
+        }
+      })
+      fileInput.click()
+    }
+
+    return { t, store, active, clickActivate, hoverActivate, closeItems, importScript }
   }
 })
 </script>

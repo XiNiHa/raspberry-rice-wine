@@ -65,7 +65,7 @@ export default defineComponent({
             const dataUrl = result.toDataURL('image/png')
 
             window.ipcRenderer.on('exported', () => resolve(null))
-            window.ipcRenderer.on('exportError', e => reject(e))
+            window.ipcRenderer.on('exportError', (e, err) => reject(err))
 
             window.ipcRenderer.send('export', {
               path: `${store.state.exportData.targetDir}/${store.state.exportData.formatter?.(state.currentIndex + 1)}`,

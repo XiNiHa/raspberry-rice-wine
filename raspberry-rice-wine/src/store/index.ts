@@ -15,63 +15,8 @@ interface FileEditState {
 
 const state = {
   currentFile: {
-    scripts: [
-      {
-        fields: [
-          {
-            name: 'Main Text',
-            value: 'Hello, World!'
-          }
-        ],
-        mappings: {}
-      },
-      {
-        fields: [
-          {
-            name: 'Main Text',
-            value: 'The second title'
-          }
-        ],
-        mappings: {}
-      },
-      {
-        fields: [
-          {
-            name: 'Main Text',
-            value: 'Unicode Test: 유니코드 테스트'
-          }
-        ],
-        mappings: {}
-      }
-    ],
-    templates: [
-      {
-        name: 'New Template',
-        width: 1920,
-        height: 1080,
-        layers: [
-          {
-            name: 'New Layer',
-            isTextbox: false,
-            children: [
-              {
-                name: 'Textbox',
-                isTextbox: true
-              }
-            ],
-            props: {
-              background: {
-                color: Color.rgb(200, 40, 40).alpha(0.8)
-              }
-            },
-            plainStyles: {
-              width: '220px',
-              height: '60px'
-            }
-          }
-        ]
-      }
-    ],
+    scripts: [],
+    templates: [],
     selectedScript: {
       anchor: null,
       rest: null
@@ -90,7 +35,8 @@ const state = {
     formatter: null as ((scriptIndex: number) => string) | null
   },
   colorPickerTarget: null as Color | null,
-  colorPickerCallback: null as ((c: Color) => void)| null
+  colorPickerCallback: null as ((c: Color) => void) | null,
+  importText: null as string | null
 }
 
 export type State = typeof state

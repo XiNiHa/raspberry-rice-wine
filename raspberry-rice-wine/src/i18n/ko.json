@@ -10,6 +10,7 @@
       "title": "파일",
       "newFile": "새 파일",
       "openFile": "열기",
+      "importScript": "스크립트 가져오기",
       "export": "내보내기"
     },
     "view": {
@@ -131,5 +132,11 @@
   },
   "exportProgressModal": {
     "title": "내보내기"
+  },
+  "importScriptModal": {
+    "title": "스크립트 가져오기",
+    "fields": "필드 목록",
+    "pattern": "패턴",
+    "import": "가져오기"
   }
 }
