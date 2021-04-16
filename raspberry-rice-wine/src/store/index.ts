@@ -72,11 +72,13 @@ export default createStore({
     [Mutations.AddScript] (state) {
       const from = state.currentFile.scripts[state.currentFile.scripts.length - 1]
       state.currentFile.scripts.push({
-        fields: from.fields.map(field => ({
-          name: field.name,
-          value: ''
-        })),
-        mappings: { ...from.mappings }
+        fields: from != null
+          ? from.fields.map(field => ({
+            name: field.name,
+            value: ''
+          }))
+          : [],
+        mappings: { ...from?.mappings }
       })
     },
     [Mutations.RemoveScript] (state, payload: { script: Script }) {
