@@ -3,7 +3,7 @@ import { computed, defineComponent, reactive } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { Mutations, State } from '@/store'
-import { Layer, Template } from '@/common/template'
+import { Layer, LayerType, Template } from '@/common/template'
 
 export default defineComponent({
   setup () {
@@ -36,7 +36,7 @@ export default defineComponent({
     const add = () => {
       const newLayer = () => ({
         name: t('hierarchy.newLayer'),
-        isTextbox: false,
+        type: LayerType.Layer as const,
         children: [],
         props: {},
         plainStyles: {}

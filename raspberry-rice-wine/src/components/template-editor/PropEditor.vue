@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
 import Color from 'color'
 import { State } from '@/store'
-import { ComponentName, LayerComponents, PropType } from '@/common/template'
+import { ComponentName, LayerComponents, LayerType, PropType } from '@/common/template'
 
 export default defineComponent({
   setup () {
@@ -21,10 +21,24 @@ export default defineComponent({
     watch(() => notInComps.value, (v) => { compNameToAdd.value = v[0] })
 
     return () => {
-      function row<T extends PropType> (name: string, value: T, onInput: (value: T) => void) {
+      function row<T> (name: string, inputElement?: T) {
+        return (
+          <li class="w-full flex justify-between items-center px-2 py-1">
+            <h1 class="text-lg text-gray-200 whitespace-nowrap">{name}</h1>
+            {inputElement}
+          </li>
+        )
+      }
+      function inputRow<T extends PropType> (name: string, value: T, onInput: (value: T) => void, typeName?: string) {
         let inputElement
 
-        if (typeof value === 'string') {
+        if (typeName === 'LayerType') {
+          inputElement = (
+              <select class="mx-2 px-1 py-1.5 w-44 rounded" value={value as string} onChange={e => onInput(parseInt((e.target as HTMLSelectElement).value) as T)}>
+                {Object.values(LayerType).filter(value => typeof value === 'number').map(value => <option value={value}>{t(`enumNames.layerType.${LayerType[value as LayerType]}`)}</option>)}
+              </select>
+          )
+        } else if (typeof value === 'string') {
           inputElement = <input type="text" class="ml-3 px-2 py-1 flex-grow rounded border border-gray-600 min-w-min" value={value} onInput={e => onInput((e.target as HTMLInputElement).value as T)} />
         } else if (typeof value === 'number') {
           inputElement = <input type="number" class="ml-3 p-1 text-right flex-grow rounded border border-gray-600 min-w-min" value={value} onInput={e => onInput(parseFloat((e.target as HTMLInputElement).value) as T)} />
@@ -47,18 +61,47 @@ export default defineComponent({
           }
         }
 
-        return (
-          <li class="w-full flex justify-between items-center px-2 py-1">
-            <h1 class="text-lg text-gray-200 whitespace-nowrap">{name}</h1>
-            {inputElement}
-          </li>
-        )
+        return row(name, inputElement)
       }
 
       if (layer.value) {
         return <ul class="w-full flex flex-col py-2">
-        {row(t('propEditor.layerName'), layer.value.name, newValue => { if (layer.value) { layer.value.name = newValue } })}
-        {row(t('propEditor.isTextbox'), layer.value.isTextbox, newValue => { if (layer.value) { layer.value.isTextbox = newValue } })}
+        {inputRow(t('propEditor.layerName'), layer.value.name, newValue => { if (layer.value) { layer.value.name = newValue } })}
+        {inputRow(t('propEditor.layerType'), layer.value.type, newValue => { if (layer.value) { layer.value.type = newValue } }, 'LayerType')}
+        {(() => {
+          const localLayer = layer.value
+          switch (localLayer.type) {
+            case LayerType.Image:
+              return row(t('propEditor.imageSrc'), (
+                <input
+                  type="text"
+                  class="ml-3 mx-2 py-1 flex-grow rounded border border-gray-600 min-w-min"
+                  value={localLayer.imageSrc}
+                  readonly
+                  onClick={() => {
+                    const fileInput = document.createElement('input')
+                    fileInput.setAttribute('type', 'file')
+                    fileInput.setAttribute('accept', 'image/*')
+                    fileInput.addEventListener('change', () => {
+                      const file = fileInput.files?.[0]
+                      if (file) {
+                        window.ipcRenderer.on('readBase64Completed', (e, base64) => {
+                          window.ipcRenderer.removeAllListeners('readBase64Completed')
+                          localLayer.imageSrc = file.path
+                          localLayer.base64Url = `data:${file.type};base64,${base64}`
+                        })
+                        window.ipcRenderer.on('readBase64Error', (e, err) => {
+                          window.ipcRenderer.removeAllListeners('readBase64Error')
+                          console.log(err)
+                        })
+                        window.ipcRenderer.send('readBase64', { path: file.path })
+                      }
+                    })
+                    fileInput.click()
+                  }} />
+              ))
+          }
+        })()}
         {
           layer.value.props && Object.entries(layer.value.props).map(([_componentName, props]) => {
             const componentName = _componentName as ComponentName
@@ -77,7 +120,7 @@ export default defineComponent({
               <ul>
                 {
                   props && Object.entries(props).map(([key, value]) => {
-                    return row(
+                    return inputRow(
                       t(`layerComponents.${componentName}.props.${key}.title`),
                       value,
                       newValue => { (props as Record<string, PropType>)[key] = newValue })
@@ -106,9 +149,9 @@ export default defineComponent({
       </ul>
       } else if (template.value) {
         return <ul class="w-full flex flex-col py-2">
-          {row(t('propEditor.templateName'), template.value.name, newValue => { if (template.value) { template.value.name = newValue } })}
-          {row(t('propEditor.templateWidth'), template.value.width, newValue => { if (template.value) { template.value.width = newValue } })}
-          {row(t('propEditor.templateHeight'), template.value.height, newValue => { if (template.value) { template.value.height = newValue } })}
+          {inputRow(t('propEditor.templateName'), template.value.name, newValue => { if (template.value) { template.value.name = newValue } })}
+          {inputRow(t('propEditor.templateWidth'), template.value.width, newValue => { if (template.value) { template.value.width = newValue } })}
+          {inputRow(t('propEditor.templateHeight'), template.value.height, newValue => { if (template.value) { template.value.height = newValue } })}
         </ul>
       } else {
         return <div />

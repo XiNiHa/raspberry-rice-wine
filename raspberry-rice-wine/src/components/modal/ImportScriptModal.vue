@@ -117,8 +117,6 @@ export default defineComponent({
     }
 
     const importScript = () => {
-      console.log('import!')
-
       const parts: string[] = []
       const mappings: Record<number, string> = {}
       let fieldCount = 0

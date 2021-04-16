@@ -64,8 +64,14 @@ export default defineComponent({
           await new Promise((resolve, reject) => {
             const dataUrl = result.toDataURL('image/png')
 
-            window.ipcRenderer.on('exported', () => resolve(null))
-            window.ipcRenderer.on('exportError', (e, err) => reject(err))
+            window.ipcRenderer.on('exported', () => {
+              window.ipcRenderer.removeAllListeners('exported')
+              resolve(null)
+            })
+            window.ipcRenderer.on('exportError', (e, err) => {
+              window.ipcRenderer.removeAllListeners('exportError')
+              reject(err)
+            })
 
             window.ipcRenderer.send('export', {
               path: `${store.state.exportData.targetDir}/${store.state.exportData.formatter?.(state.currentIndex + 1)}`,

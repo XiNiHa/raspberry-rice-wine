@@ -103,6 +103,7 @@ export default defineComponent({
       fileInput.addEventListener('input', () => {
         if (fileInput.files) {
           window.ipcRenderer.on('readCompleted', (e, content) => {
+            window.ipcRenderer.removeAllListeners('readCompleted')
             store.state.importText = content
             store.state.activeModal = 'importScript'
           })

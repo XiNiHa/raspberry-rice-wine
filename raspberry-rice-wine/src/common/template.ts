@@ -71,6 +71,21 @@ export const LayerComponents = {
     paddingRight: number;
     paddingTop: number;
     paddingBottom: number;
+  }>,
+  sizing: {
+    transformer (props) {
+      return {
+        width: props.width + 'px',
+        height: props.height + 'px'
+      }
+    },
+    defaultProps: () => ({
+      width: 100,
+      height: 100
+    })
+  } as Component<{
+    width: number;
+    height: number;
   }>
 }
 
@@ -83,9 +98,20 @@ export type ComponentPropType<T extends ComponentName> = ComponentProps[T]
 export type ComponentPropKey<T extends ComponentName> = keyof ComponentPropType<T>
 export type ComponentPropValue<P extends ComponentName, T extends ComponentPropKey<P>> = ComponentPropType<P>[T]
 
-export interface Layer {
+export enum LayerType {
+  Layer,
+  Text,
+  Image
+}
+
+export type Layer = ({
+  type: LayerType.Layer | LayerType.Text;
+} | {
+  type: LayerType.Image;
+  imageSrc?: string;
+  base64Url?: string;
+}) & {
   name: string;
-  isTextbox: boolean;
   children?: Layer[];
   props?: Partial<ComponentProps>;
   plainStyles?: Record<string, string>;
@@ -102,7 +128,7 @@ export function getTextboxes (layers: Layer[]): Layer[] {
   const result = []
 
   for (const layer of layers) {
-    if (layer.isTextbox) {
+    if (layer.type === LayerType.Text) {
       result.push(layer)
     }
 

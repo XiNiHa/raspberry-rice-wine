@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ComponentName, Layer, LayerComponents, Template } from '@/common/template'
+import { ComponentName, Layer, LayerComponents, LayerType, Template } from '@/common/template'
 
 export default defineComponent({
   props: {
@@ -40,12 +40,27 @@ export default defineComponent({
           }
         }
 
-        return <div style={styleObj}>
-          { layer.isTextbox && <span class="inline-block max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap">
-            { props.textboxMappings[layer.name] ?? t('layerPreview.textboxPlaceholder')}
-          </span> }
-          { layer.children?.map(renderLayer) }
-        </div>
+        switch (layer.type) {
+          case LayerType.Layer:
+            return (
+              <div style={styleObj}>
+                { layer.children?.map(renderLayer) }
+              </div>
+            )
+          case LayerType.Text:
+            return (
+              <span style={styleObj} class="inline-block max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap">
+                { props.textboxMappings[layer.name] ?? t('layerPreview.textboxPlaceholder')}
+                { layer.children?.map(renderLayer) }
+              </span>
+            )
+          case LayerType.Image:
+            return (
+              <img src={layer.base64Url} style={styleObj}>
+                { layer.children?.map(renderLayer) }
+              </img>
+            )
+        }
       }
 
       if (props.root) {
