@@ -16,7 +16,7 @@
       </HeaderButton>
     </div>
   </nav>
-  <Toolbar />
+  <Toolbar v-if="!isMac" />
 </template>
 
 <script lang="ts">

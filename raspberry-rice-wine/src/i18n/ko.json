@@ -6,6 +6,14 @@
     "tab": "탭"
   },
   "toolbar": {
+    "app": {
+      "about": "복분자막걸리에 관하여",
+      "services": "서비스",
+      "hide": "복분자막걸리 가리기",
+      "hideothers": "기타 가리기",
+      "unhide": "모두 표시",
+      "quit": "복분자막걸리 종료"
+    },
     "file": {
       "title": "파일",
       "newFile": "새 파일",
@@ -71,6 +79,17 @@
           "title": "하단 내부 여백"
         }
       }
+    },
+    "sizing": {
+      "title": "크기",
+      "props": {
+        "width": {
+          "title": "넓이"
+        },
+        "height": {
+          "title": "높이"
+        }
+      }
     }
   },
   "scriptEditor": {
@@ -96,7 +115,8 @@
   "propEditor": {
     "title": "속성 편집",
     "layerName": "레이어 이름",
-    "isTextbox": "텍스트 상자로 작동",
+    "layerType": "레이어 종류",
+    "imageSrc": "이미지 경로",
     "templateName": "템플릿 이름",
     "templateWidth": "넓이",
     "templateHeight": "높이"
@@ -138,5 +158,12 @@
     "fields": "필드 목록",
     "pattern": "패턴",
     "import": "가져오기"
+  },
+  "enumNames": {
+    "layerType": {
+      "Layer": "레이어",
+      "Text": "텍스트",
+      "Image": "이미지"
+    }
   }
 }

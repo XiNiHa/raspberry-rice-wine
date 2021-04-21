@@ -6,6 +6,14 @@
     "tab": "Tab"
   },
   "toolbar": {
+    "app": {
+      "about": "About Raspberry Rice Wine",
+      "services": "Services",
+      "hide": "Hide Raspberry Rice Wine",
+      "hideothers": "Hide Others",
+      "unhide": "Show All",
+      "quit": "Quit Raspberry Rice Wine"
+    },
     "file": {
       "title": "File",
       "newFile": "New File",
@@ -71,6 +79,17 @@
           "title": "Bottom Inner Space"
         }
       }
+    },
+    "sizing": {
+      "title": "Sizing",
+      "props": {
+        "width": {
+          "title": "Width"
+        },
+        "height": {
+          "title": "Height" 
+        }
+      }
     }
   },
   "scriptEditor": {
@@ -96,7 +115,8 @@
   "propEditor": {
     "title": "Edit Properties",
     "layerName": "Layer Name",
-    "isTextbox": "Is Textbox",
+    "layerType": "Layer Type",
+    "imageSrc": "Image Source",
     "templateName": "Template Name",
     "templateWidth": "Width",
     "templateHeight": "Height"
@@ -138,5 +158,12 @@
     "fields": "Fields",
     "pattern": "Pattern",
     "import": "Import"
+  },
+  "enumNames": {
+    "layerType": {
+      "Layer": "Layer",
+      "Text": "Text",
+      "Image": "Image"
+    }
   }
 }

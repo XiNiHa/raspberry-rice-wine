@@ -4,6 +4,8 @@ import path from 'path'
 import { app, protocol, BrowserWindow } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension from 'electron-devtools-installer'
+import setupIpcHandler from './ipcHandler'
+import menuCreator from './menuCreator'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -76,8 +78,10 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString())
     }
   }
-  import('./ipcHandler')
+
   createWindow()
+  setupIpcHandler(win as BrowserWindow)
+  menuCreator(win as BrowserWindow)
 })
 
 // Exit cleanly on request from parent process in development mode.

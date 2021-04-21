@@ -1,7 +1,7 @@
-import { app, ipcMain } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron'
 import fs from 'fs'
 
-export default function (): void {
+export default function (window: BrowserWindow): void {
   ipcMain.on('close', (e, arg) => app.quit())
   ipcMain.on('export', (e, args: { path: string; dataUrl: string }) => {
     const sender = e.sender
@@ -12,18 +12,38 @@ export default function (): void {
       else sender.send('exported')
     })
   })
-  ipcMain.on('read', (e, args: { path: string }) => {
+  ipcMain.on('read', async (e, args: {
+    encoding: BufferEncoding;
+    fileTypes: {
+      name: string;
+      extensions: string[];
+    }[];
+  }) => {
     const sender = e.sender
-    fs.readFile(args.path, (e, buf) => {
+    const result = await dialog.showOpenDialog(window, {
+      filters: args.fileTypes,
+      properties: ['openFile']
+    })
+    fs.readFile(result.filePaths[0], (e, buf) => {
       if (e) sender.send('readError', e)
-      else sender.send('readCompleted', buf.toString('utf8'))
+      else {
+        sender.send('readCompleted', {
+          data: buf.toString(args.encoding),
+          path: result.filePaths[0]
+        })
+      }
     })
   })
-  ipcMain.on('readBase64', (e, args: { path: string }) => {
-    const sender = e.sender
-    fs.readFile(args.path, (e, buf) => {
-      if (e) sender.send('readBase64Error', e)
-      else sender.send('readBase64Completed', buf.toString('base64'))
-    })
+  ipcMain.on('viewChanged', (e, name) => {
+    const viewMenu = Menu.getApplicationMenu()?.getMenuItemById('viewMenu')
+    if (viewMenu) {
+      viewMenu.submenu?.items.forEach(item => {
+        if (item.id === `viewMenu_${name}`) {
+          item.checked = true
+        } else {
+          item.checked = false
+        }
+      })
+    }
   })
 }

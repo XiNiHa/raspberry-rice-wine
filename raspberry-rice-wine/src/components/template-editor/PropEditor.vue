@@ -3,6 +3,8 @@ import { computed, defineComponent, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
 import Color from 'color'
+import Mime from 'mime-types'
+import MimeDb from 'mime-db'
 import { State } from '@/store'
 import { ComponentName, LayerComponents, LayerType, PropType } from '@/common/template'
 
@@ -79,25 +81,29 @@ export default defineComponent({
                   value={localLayer.imageSrc}
                   readonly
                   onClick={() => {
-                    const fileInput = document.createElement('input')
-                    fileInput.setAttribute('type', 'file')
-                    fileInput.setAttribute('accept', 'image/*')
-                    fileInput.addEventListener('change', () => {
-                      const file = fileInput.files?.[0]
-                      if (file) {
-                        window.ipcRenderer.on('readBase64Completed', (e, base64) => {
-                          window.ipcRenderer.removeAllListeners('readBase64Completed')
-                          localLayer.imageSrc = file.path
-                          localLayer.base64Url = `data:${file.type};base64,${base64}`
-                        })
-                        window.ipcRenderer.on('readBase64Error', (e, err) => {
-                          window.ipcRenderer.removeAllListeners('readBase64Error')
-                          console.log(err)
-                        })
-                        window.ipcRenderer.send('readBase64', { path: file.path })
-                      }
+                    window.ipcRenderer.on('readCompleted', (e, { path, data: base64 }: {
+                      data: string;
+                      path: string;
+                    }) => {
+                      window.ipcRenderer.removeAllListeners('readCompleted')
+                      const type = Mime.lookup(path)
+                      localLayer.imageSrc = path
+                      localLayer.base64Url = `data:${type};base64,${base64}`
                     })
-                    fileInput.click()
+                    window.ipcRenderer.on('readError', (e, err) => {
+                      window.ipcRenderer.removeAllListeners('readError')
+                      console.log(err)
+                    })
+                    window.ipcRenderer.send('read', {
+                      encoding: 'base64',
+                      fileTypes: [{
+                        name: 'Images',
+                        extensions: Object.entries(MimeDb)
+                          .filter(([k]) => k.match(/image\/.+/))
+                          .map(([, v]) => v.extensions ?? [])
+                          .flat()
+                      }]
+                    })
                   }} />
               ))
           }
