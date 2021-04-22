@@ -18,6 +18,8 @@
       "title": "File",
       "newFile": "New File",
       "openFile": "Open",
+      "saveFile": "Save",
+      "saveFileAs": "Save As",
       "importScript": "Import Script",
       "export": "Export"
     },

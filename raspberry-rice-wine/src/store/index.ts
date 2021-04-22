@@ -5,6 +5,7 @@ import { Script } from '@/common/script'
 import { Layer, Template } from '@/common/template'
 
 interface FileEditState {
+  fsPath?: string;
   selectedScript: {
     anchor: Script | null;
     rest: Script[] | null;

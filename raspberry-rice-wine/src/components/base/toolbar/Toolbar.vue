@@ -8,6 +8,8 @@
       @close-items="closeItems">
       <ToolbarItem path="file.newFile" />
       <ToolbarItem path="file.openFile" />
+      <ToolbarItem path="file.saveFile" />
+      <ToolbarItem path="file.saveFileAs" />
       <ToolbarSeparator />
       <ToolbarItem path="file.importScript" />
       <ToolbarItem path="file.export" />

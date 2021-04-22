@@ -18,6 +18,8 @@
       "title": "파일",
       "newFile": "새 파일",
       "openFile": "열기",
+      "saveFile": "저장",
+      "saveFileAs": "다른 이름으로 저장",
       "importScript": "스크립트 가져오기",
       "export": "내보내기"
     },

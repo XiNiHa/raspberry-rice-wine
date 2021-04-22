@@ -51,6 +51,14 @@ export default async function (window: BrowserWindow): Promise<void> {
           label: t('toolbar.file.openFile'),
           click: () => window.webContents.send('toolbar', 'file.openFile')
         },
+        {
+          label: t('toolbar.file.saveFile'),
+          click: () => window.webContents.send('toolbar', 'file.saveFile')
+        },
+        {
+          label: t('toolbar.file.saveFileAs'),
+          click: () => window.webContents.send('toolbar', 'file.saveFileAs')
+        },
         ...(process.env.NODE_ENV === 'development'
           ? [
               { type: 'separator' as const },

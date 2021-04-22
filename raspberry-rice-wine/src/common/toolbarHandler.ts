@@ -1,6 +1,7 @@
 import { Store } from 'vuex'
 import { Router } from 'vue-router'
 import { State } from '@/store'
+import { openFile, saveFile, saveFileAs } from './file'
 
 type Context = {
   router?: Router;
@@ -29,8 +30,23 @@ export default function (path: string, context: Context): void {
 
 const handlerMap: HandlerMap = {
   file: {
-    newFile: () => { /* */ },
-    openFile: () => { /* */ },
+    newFile: ({ store }) => {
+      if (store) {
+        store.state.currentFile = {
+          scripts: [],
+          templates: [],
+          selectedScript: {
+            anchor: null,
+            rest: null
+          },
+          selectedTemplate: null,
+          selectedLayer: null
+        }
+      }
+    },
+    openFile,
+    saveFile,
+    saveFileAs,
     importScript: ({ store }) => {
       window.ipcRenderer.on('readCompleted', (e, { data: content }) => {
         window.ipcRenderer.removeAllListeners('readCompleted')
