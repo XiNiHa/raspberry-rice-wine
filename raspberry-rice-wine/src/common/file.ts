@@ -9,13 +9,21 @@ export interface File {
   templates: Template[];
 }
 
+export type TypedObject = {
+  type: 'Color';
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
+
 export interface JsonLayer {
   type: LayerType;
   imageSrc?: string;
   base64Url?: string;
   name: string;
   children?: JsonLayer[],
-  props?: Record<string, Record<string, Exclude<PropType, Color>>>;
+  props?: Record<string, Record<string, Exclude<PropType, Color> | TypedObject>>;
   plainStyles?: Record<string, string>;
 }
 
@@ -104,14 +112,20 @@ function toJson (file: File) {
         plainStyles: layer.plainStyles
       }
       if (layer.props) {
-        const convertedProps: Record<string, Record<string, Exclude<PropType, Color>>> = {}
+        const convertedProps: Record<string, Record<string, Exclude<PropType, Color> | TypedObject>> = {}
         for (const [propKey, propObj] of Object.entries(layer.props)) {
           if (!propObj) continue
           convertedProps[propKey] = {}
 
           for (const [key, value] of Object.entries(propObj)) {
             if (typeof value === 'object' && value instanceof Color) {
-              convertedProps[propKey][key] = `__$COLOR$__${value.red()},${value.green()},${value.blue()},${value.alpha()}`
+              convertedProps[propKey][key] = {
+                type: 'Color',
+                r: value.red(),
+                g: value.green(),
+                b: value.blue(),
+                a: value.alpha()
+              }
             } else {
               convertedProps[propKey][key] = value
             }
@@ -158,9 +172,10 @@ function fromJson (json: string) {
           convertedProps[propKey] = {}
 
           for (const [key, value] of Object.entries(propObj)) {
-            if (typeof value === 'string' && value.startsWith('__$COLOR$__')) {
-              const values = value.replace('__$COLOR$__', '').split(',').map(parseFloat)
-              convertedProps[propKey][key] = Color.rgb(values[0], values[1], values[2]).alpha(values[3])
+            if (typeof value === 'object') {
+              if (value.type === 'Color') {
+                convertedProps[propKey][key] = Color.rgb(value.r, value.g, value.b).alpha(value.a)
+              }
             } else {
               convertedProps[propKey][key] = value
             }
