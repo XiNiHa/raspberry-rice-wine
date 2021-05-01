@@ -1,24 +1,3 @@
-# raspberry-rice-wine
+# Raspberry Rice Wine
 
-## Project setup
-```
-yarn install
-```
-
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
-
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+Raspberry Rice Wine is a utility that helps generating video titles from text scripts and graphic templates.
