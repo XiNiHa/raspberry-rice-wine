@@ -57,40 +57,18 @@ export default defineComponent({
         await nextTick()
 
         if (renderArea.value) {
-          const result = await html2canvas(renderArea.value, {
-            backgroundColor: null
+          const result = await html2canvas(renderArea.value, { backgroundColor: null })
+          const dataUrl = result.toDataURL('image/png')
+          await window.fileIo.save({
+            path: `${store.state.exportData.targetDir}/${store.state.exportData.formatter?.(state.currentIndex + 1)}`,
+            encoding: 'base64url',
+            data: dataUrl
           })
-
-          await new Promise((resolve, reject) => {
-            const dataUrl = result.toDataURL('image/png')
-
-            window.ipcRenderer.on('exported', () => {
-              window.ipcRenderer.removeAllListeners('exported')
-              resolve(null)
-            })
-            window.ipcRenderer.on('exportError', (e, err) => {
-              window.ipcRenderer.removeAllListeners('exportError')
-              reject(err)
-            })
-
-            window.ipcRenderer.send('export', {
-              path: `${store.state.exportData.targetDir}/${store.state.exportData.formatter?.(state.currentIndex + 1)}`,
-              dataUrl
-            })
-          }).catch(() => { /* */ })
-
-          window.ipcRenderer.removeAllListeners('exported')
-          window.ipcRenderer.removeAllListeners('exportError')
         }
       }
 
       store.state.activeModal = ''
     })()
-
-    onDeactivated(() => {
-      window.ipcRenderer.removeAllListeners('exported')
-      window.ipcRenderer.removeAllListeners('exportError')
-    })
 
     return { t, state, progress, currentTemplate, textboxMappings, renderArea, totalCount, renderAreaStyles }
   }

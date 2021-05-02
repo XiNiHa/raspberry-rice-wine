@@ -48,19 +48,17 @@ const handlerMap: HandlerMap = {
     saveFile,
     saveFileAs,
     importScript: ({ store }) => {
-      window.ipcRenderer.on('readCompleted', (e, { data: content }) => {
-        window.ipcRenderer.removeAllListeners('readCompleted')
-        if (store) {
-          store.state.importText = content
-          store.state.activeModal = 'importScript'
-        }
-      })
-      window.ipcRenderer.send('read', {
+      window.fileIo.open({
         encoding: 'utf8',
         fileTypes: [{
           name: 'Text Files',
           extensions: ['txt']
         }]
+      }).then(({ data }) => {
+        if (store) {
+          store.state.importText = data
+          store.state.activeModal = 'importScript'
+        }
       })
     },
     export: ({ store }) => {
@@ -72,15 +70,15 @@ const handlerMap: HandlerMap = {
   view: {
     scriptEditor: ({ router }) => {
       router?.push('/')
-      window.ipcRenderer.send('viewChanged', 'scriptEditor')
+      window.shell.notifyNewView('scriptEditor')
     },
     templateEditor: ({ router }) => {
       router?.push('/template-editor')
-      window.ipcRenderer.send('viewChanged', 'templateEditor')
+      window.shell.notifyNewView('templateEditor')
     },
     settings: ({ router }) => {
       router?.push('/settings')
-      window.ipcRenderer.send('viewChanged', 'settings')
+      window.shell.notifyNewView('settings')
     }
   }
 }

@@ -24,9 +24,9 @@ export default defineComponent({
 
     const showHeader = ref(true)
 
-    window.ipcRenderer.on('enter-fullscreen', () => { showHeader.value = false })
-    window.ipcRenderer.on('leave-fullscreen', () => { showHeader.value = true })
-    window.ipcRenderer.on('toolbar', (_, path) => toolbarHandler(path, { router, store }))
+    window.shell.registerEnterFullscreenHandler(() => { showHeader.value = false })
+    window.shell.registerLeaveFullscreenHandler(() => { showHeader.value = true })
+    window.shell.registerToolbarHandler((_, { path }) => toolbarHandler(path, { router, store }))
 
     return { store, showHeader }
   }

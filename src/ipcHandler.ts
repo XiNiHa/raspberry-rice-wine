@@ -1,83 +1,102 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron'
+import { app, BrowserWindow, dialog, FileFilter, ipcMain, IpcMainEvent, IpcRendererEvent, Menu, WebContents } from 'electron'
 import fs from 'fs'
 
-export default function (window: BrowserWindow): void {
-  ipcMain.on('close', (e, arg) => app.quit())
-  ipcMain.on('openFile', async (e) => {
-    const sender = e.sender
-    const result = await dialog.showOpenDialog(window, {
-      filters: [{
-        name: 'RRW Project File',
-        extensions: ['rrw']
-      }],
-      properties: ['openFile']
-    })
-    fs.readFile(result.filePaths[0], (e, buf) => {
-      if (e) sender.send('openFileError', e)
-      else {
-        sender.send('openFileCompleted', {
-          path: result.filePaths[0],
-          json: buf.toString('utf8')
-        })
-      }
-    })
-  })
-  ipcMain.on('saveFile', (e, args: { path: string, json: string }) => {
-    const sender = e.sender
-    fs.writeFile(args.path, args.json, 'utf8', (e) => {
-      if (e) sender.send('saveFileError', e)
-      else sender.send('saveFileCompleted')
-    })
-  })
-  ipcMain.on('saveFileAs', async (e, { json }: { json: string }) => {
-    const sender = e.sender
-    const result = await dialog.showSaveDialog(window, {
-      defaultPath: 'Project.rrw',
-      filters: [{
-        name: 'RRW Project File',
-        extensions: ['rrw']
-      }],
-      properties: ['createDirectory']
-    })
-    if (!result.canceled && result.filePath) {
-      fs.writeFile(result.filePath, json, 'utf8', (e) => {
-        if (e) sender.send('saveFileAsError', e)
-        else sender.send('saveFileAsCompleted', result.filePath)
-      })
-    }
-  })
-  ipcMain.on('export', (e, args: { path: string; dataUrl: string }) => {
-    const sender = e.sender
-    fs.writeFile(args.path, args.dataUrl.replace(/^data:image\/png;base64,/, ''), {
-      encoding: 'base64'
-    }, (e) => {
-      if (e) sender.send('exportError', e)
-      else sender.send('exported')
-    })
-  })
-  ipcMain.on('read', async (e, args: {
+export type IpcRendererArgs = {
+  close: void;
+  open: {
     encoding: BufferEncoding;
-    fileTypes: {
-      name: string;
-      extensions: string[];
-    }[];
-  }) => {
+    fileTypes?: FileFilter[];
+  };
+  save: {
+    path: string;
+    encoding: BufferEncoding;
+    data: string;
+  };
+  saveAs: {
+    encoding: BufferEncoding;
+    data: string;
+    fileTypes?: FileFilter[];
+    defaultPath: string;
+  },
+  viewChanged: {
+    name: string;
+  }
+}
+
+export type IpcMainArgs = {
+  enterFullscreen: void;
+  leaveFullscreen: void;
+  toolbar: {
+    path: string;
+  };
+  openCompleted: {
+    data: string;
+    path: string;
+  };
+  openError: Error;
+  saveCompleted: void;
+  saveError: Error;
+  saveAsCompleted: {
+    path: string;
+  }
+  saveAsError: Error;
+}
+
+export type IpcRendererChannel = keyof IpcRendererArgs
+export type IpcMainChannel = keyof IpcMainArgs
+
+export type IpcRendererHandler<T extends keyof IpcRendererArgs> = (event: IpcMainEvent, args: IpcRendererArgs[T]) => void
+export type IpcMainHandler<T extends keyof IpcMainArgs> = (event: IpcRendererEvent, args: IpcMainArgs[T]) => void
+
+function ipcMainOn<T extends IpcRendererChannel> (channel: T, handler: IpcRendererHandler<T>) {
+  return ipcMain.on(channel, handler)
+}
+
+function ipcMainSend<T extends IpcMainChannel> (sender: WebContents, channel: T, args: IpcMainArgs[T]) {
+  return sender.send(channel, args)
+}
+
+export default function (window: BrowserWindow): void {
+  ipcMainOn('close', () => app.quit())
+  ipcMainOn('open', async (e, args) => {
     const sender = e.sender
     const result = await dialog.showOpenDialog(window, {
       filters: args.fileTypes,
       properties: ['openFile']
     })
-    fs.readFile(result.filePaths[0], (e, buf) => {
-      if (e) sender.send('readError', e)
+    fs.readFile(result.filePaths[0], (error, buf) => {
+      if (error) ipcMainSend(sender, 'openError', error)
       else {
-        sender.send('readCompleted', {
+        ipcMainSend(sender, 'openCompleted', {
           data: buf.toString(args.encoding),
           path: result.filePaths[0]
         })
       }
     })
   })
-  ipcMain.on('viewChanged', (e, name) => {
+  ipcMainOn('save', (e, { path, data, encoding }) => {
+    const sender = e.sender
+    fs.writeFile(path, data, encoding, (error) => {
+      if (error) ipcMainSend(sender, 'saveError', error)
+      else ipcMainSend(sender, 'saveCompleted', undefined)
+    })
+  })
+  ipcMainOn('saveAs', async (e, { data, encoding, fileTypes, defaultPath }) => {
+    const sender = e.sender
+    const result = await dialog.showSaveDialog(window, {
+      defaultPath,
+      filters: fileTypes,
+      properties: ['createDirectory']
+    })
+    if (!result.canceled && result.filePath) {
+      fs.writeFile(result.filePath, data, encoding, (error) => {
+        if (error) ipcMainSend(sender, 'saveAsError', error)
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        else ipcMainSend(sender, 'saveAsCompleted', { path: result.filePath! })
+      })
+    }
+  })
+  ipcMainOn('viewChanged', (e, { name }) => {
     const viewMenu = Menu.getApplicationMenu()?.getMenuItemById('viewMenu')
     if (viewMenu) {
       viewMenu.submenu?.items.forEach(item => {

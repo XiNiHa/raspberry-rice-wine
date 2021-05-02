@@ -29,8 +29,8 @@ export default defineComponent({
   components: { HeaderButton, Toolbar },
   setup () {
     const { t } = useI18n()
-    const close = () => window.ipcRenderer.send('close')
-    const isMac = window.platform === 'darwin'
+    const close = window.shell.close
+    const isMac = window.info.platform === 'darwin'
 
     return { close, isMac, t }
   }

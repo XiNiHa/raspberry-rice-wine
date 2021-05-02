@@ -6,7 +6,7 @@ module.exports = {
   },
   pluginOptions: {
     electronBuilder: {
-      preload: 'src/preload.js',
+      preload: 'src/preload.ts',
       builderOptions: {
         appId: 'io.github.xiniha.rrw',
         win: {

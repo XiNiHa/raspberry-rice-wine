@@ -11,7 +11,7 @@ export default defineComponent({
     },
     textboxMappings: {
       type: Object as PropType<Record<string, string>>,
-      default: {}
+      default: () => ({})
     }
   },
   setup (props) {

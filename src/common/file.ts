@@ -43,12 +43,15 @@ export interface JsonFile {
 
 export function openFile ({ store }: {store?: Store<State>}): void {
   if (store) {
-    window.ipcRenderer.on('openFileCompleted', (e, { path, json }: {
-      path: string;
-      json: string;
-    }) => {
+    window.fileIo.open({
+      encoding: 'utf8',
+      fileTypes: [{
+        name: 'RRW Project File',
+        extensions: ['rrw']
+      }]
+    }).then(({ data, path }) => {
       store.state.currentFile = {
-        ...fromJson(json),
+        ...fromJson(JSON.parse(data)),
         fsPath: path,
         selectedScript: {
           anchor: null,
@@ -58,7 +61,6 @@ export function openFile ({ store }: {store?: Store<State>}): void {
         selectedLayer: null
       }
     })
-    window.ipcRenderer.send('openFile')
   }
 }
 
@@ -69,9 +71,10 @@ export function saveFile ({ store }: {store?: Store<State>}): void {
     }
 
     const json = toJson(store.state.currentFile)
-    window.ipcRenderer.send('saveFile', {
+    window.fileIo.save({
       path: store.state.currentFile.fsPath,
-      json
+      encoding: 'utf8',
+      data: json
     })
   }
 }
@@ -79,11 +82,15 @@ export function saveFile ({ store }: {store?: Store<State>}): void {
 export function saveFileAs ({ store }: {store?: Store<State>}): void {
   if (store) {
     const json = toJson(store.state.currentFile)
-    window.ipcRenderer.on('saveFileAsCompleted', (e, { path }) => {
-      window.ipcRenderer.removeAllListeners('saveAsCompleted')
-      store.state.currentFile.fsPath = path
-    })
-    window.ipcRenderer.send('saveFileAs', { json })
+    window.fileIo.saveAs({
+      encoding: 'utf8',
+      data: json,
+      defaultPath: 'Project.rrw',
+      fileTypes: [{
+        name: 'RRW Project File',
+        extensions: ['rrw']
+      }]
+    }).then(({ path }) => { store.state.currentFile.fsPath = path })
   }
 }
 

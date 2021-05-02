@@ -81,20 +81,7 @@ export default defineComponent({
                   value={localLayer.imageSrc}
                   readonly
                   onClick={() => {
-                    window.ipcRenderer.on('readCompleted', (e, { path, data: base64 }: {
-                      data: string;
-                      path: string;
-                    }) => {
-                      window.ipcRenderer.removeAllListeners('readCompleted')
-                      const type = Mime.lookup(path)
-                      localLayer.imageSrc = path
-                      localLayer.base64Url = `data:${type};base64,${base64}`
-                    })
-                    window.ipcRenderer.on('readError', (e, err) => {
-                      window.ipcRenderer.removeAllListeners('readError')
-                      console.log(err)
-                    })
-                    window.ipcRenderer.send('read', {
+                    window.fileIo.open({
                       encoding: 'base64',
                       fileTypes: [{
                         name: 'Images',
@@ -104,6 +91,12 @@ export default defineComponent({
                           .flat()
                       }]
                     })
+                      .then(({ path, data: base64 }) => {
+                        const type = Mime.lookup(path)
+                        localLayer.imageSrc = path
+                        localLayer.base64Url = `data:${type};base64,${base64}`
+                      })
+                      .catch((err) => console.log(err))
                   }} />
               ))
           }
