@@ -45,19 +45,19 @@ export default async function (window: BrowserWindow): Promise<void> {
       submenu: [
         {
           label: t('toolbar.file.newFile'),
-          click: () => window.webContents.send('toolbar', 'file.newFile')
+          click: () => window.webContents.send('toolbar', { path: 'file.newFile' })
         },
         {
           label: t('toolbar.file.openFile'),
-          click: () => window.webContents.send('toolbar', 'file.openFile')
+          click: () => window.webContents.send('toolbar', { path: 'file.openFile' })
         },
         {
           label: t('toolbar.file.saveFile'),
-          click: () => window.webContents.send('toolbar', 'file.saveFile')
+          click: () => window.webContents.send('toolbar', { path: 'file.saveFile' })
         },
         {
           label: t('toolbar.file.saveFileAs'),
-          click: () => window.webContents.send('toolbar', 'file.saveFileAs')
+          click: () => window.webContents.send('toolbar', { path: 'file.saveFileAs' })
         },
         ...(process.env.NODE_ENV === 'development'
           ? [
@@ -68,11 +68,11 @@ export default async function (window: BrowserWindow): Promise<void> {
         { type: 'separator' },
         {
           label: t('toolbar.file.importScript'),
-          click: () => window.webContents.send('toolbar', 'file.importScript')
+          click: () => window.webContents.send('toolbar', { path: 'file.importScript' })
         },
         {
           label: t('toolbar.file.export'),
-          click: () => window.webContents.send('toolbar', 'file.export')
+          click: () => window.webContents.send('toolbar', { path: 'file.export' })
         }
       ]
     },
@@ -85,14 +85,14 @@ export default async function (window: BrowserWindow): Promise<void> {
           label: t('toolbar.view.scriptEditor'),
           type: 'checkbox',
           checked: true,
-          click: () => window.webContents.send('toolbar', 'view.scriptEditor')
+          click: () => window.webContents.send('toolbar', { path: 'view.scriptEditor' })
         },
         {
           id: 'viewMenu_templateEditor',
           label: t('toolbar.view.templateEditor'),
           type: 'checkbox',
           checked: false,
-          click: () => window.webContents.send('toolbar', 'view.templateEditor')
+          click: () => window.webContents.send('toolbar', { path: 'view.templateEditor' })
         },
         { type: 'separator' },
         {
@@ -100,7 +100,7 @@ export default async function (window: BrowserWindow): Promise<void> {
           label: t('toolbar.view.settings'),
           type: 'checkbox',
           checked: false,
-          click: () => window.webContents.send('toolbar', 'view.settings')
+          click: () => window.webContents.send('toolbar', { path: 'view.settings' })
         }
       ]
     }
