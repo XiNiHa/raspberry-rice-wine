@@ -104,6 +104,7 @@ export default defineComponent({
         {
           layer.value.props && Object.entries(layer.value.props).map(([_componentName, props]) => {
             const componentName = _componentName as ComponentName
+            const EditorComponent = LayerComponents[componentName].editorComponent
 
             return <>
               <h1 class="mt-6 mb-1 text-center text-xl text-gray-100">
@@ -116,16 +117,13 @@ export default defineComponent({
                   <i class="fas fa-times" />
                 </button>
               </h1>
-              <ul>
-                {
-                  props && Object.entries(props).map(([key, value]) => {
-                    return inputRow(
-                      t(`layerComponents.${componentName}.props.${key}.title`),
-                      value,
-                      newValue => { (props as Record<string, PropType>)[key] = newValue })
-                  })
-                }
-              </ul>
+              { /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */ }
+              { /* @ts-ignore */ }
+              <EditorComponent modelValue={props} onUpdate:modelValue={(val) => {
+                Object.entries(val).forEach(([k, v]) => {
+                  (props as Record<string, PropType>)[k] = v as PropType
+                })
+              }} />
             </>
           })
         }

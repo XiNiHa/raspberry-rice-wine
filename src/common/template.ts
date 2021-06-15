@@ -1,4 +1,9 @@
 import Color from 'color'
+import { Component as VueComponent } from 'vue'
+import { BackgroundComponent } from './layerComponents/background'
+import { FlexComponent } from './layerComponents/flex'
+import { SizingComponent } from './layerComponents/sizing'
+import { SpacingComponent } from './layerComponents/spacing'
 
 export type PropType = string | number | boolean | Color
 
@@ -7,86 +12,19 @@ export type ComponentProp<T> = {
 }
 
 export interface Component<T extends ComponentProp<T>> {
-  transformer: (props: T) => Record<keyof CSSStyleDeclaration, string>;
+  editorComponent: VueComponent<{
+    modelValue: T;
+    'onUpdate:modelValue': (value: T) => void;
+  }>,
+  transformer: (props: T) => Partial<Record<keyof CSSStyleDeclaration, string>>;
   defaultProps: () => T;
 }
 
 export const LayerComponents = {
-  background: {
-    transformer (props) {
-      return {
-        backgroundColor: props.color.string()
-      }
-    },
-    defaultProps: () => ({ color: Color.rgb(255, 255, 255).alpha(1) })
-  } as Component<{ color: Color }>,
-  flex: {
-    transformer (props) {
-      return {
-        display: 'flex',
-        flexDirection: props.direction,
-        alignItems: props.alignItems,
-        justifyContent: props.justifyContent
-      }
-    },
-    defaultProps: () => ({
-      direction: 'row',
-      alignItems: 'center',
-      justifyContent: 'center'
-    })
-  } as Component<{
-    direction: string;
-    alignItems: string;
-    justifyContent: string;
-  }>,
-  spacing: {
-    transformer (props) {
-      return {
-        marginLeft: props.marginLeft + 'px',
-        marginRight: props.marginRight + 'px',
-        marginTop: props.marginTop + 'px',
-        marginBottom: props.marginBottom + 'px',
-        paddingLeft: props.paddingLeft + 'px',
-        paddingRight: props.paddingRight + 'px',
-        paddingTop: props.paddingTop + 'px',
-        paddingBottom: props.paddingBottom + 'px'
-      }
-    },
-    defaultProps: () => ({
-      marginLeft: 0,
-      marginRight: 0,
-      marginTop: 0,
-      marginBottom: 0,
-      paddingLeft: 0,
-      paddingRight: 0,
-      paddingTop: 0,
-      paddingBottom: 0
-    })
-  } as Component<{
-    marginLeft: number;
-    marginRight: number;
-    marginTop: number;
-    marginBottom: number;
-    paddingLeft: number;
-    paddingRight: number;
-    paddingTop: number;
-    paddingBottom: number;
-  }>,
-  sizing: {
-    transformer (props) {
-      return {
-        width: props.width + 'px',
-        height: props.height + 'px'
-      }
-    },
-    defaultProps: () => ({
-      width: 100,
-      height: 100
-    })
-  } as Component<{
-    width: number;
-    height: number;
-  }>
+  background: BackgroundComponent,
+  flex: FlexComponent,
+  spacing: SpacingComponent,
+  sizing: SizingComponent
 }
 
 export type ComponentProps = {
