@@ -1,7 +1,9 @@
 <script lang="tsx">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent } from 'vue'
+import type { PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ComponentName, Layer, LayerComponents, LayerType, Template } from '@/common/template'
+import { LayerComponents, LayerType } from '@/common/template'
+import type { ComponentName, Layer, Template } from '@/common/template'
 
 export default defineComponent({
   props: {

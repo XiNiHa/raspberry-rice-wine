@@ -1,5 +1,5 @@
 import Color from 'color'
-import { Component } from '../template'
+import type { Component } from '../template'
 import Default from './editorComponents/Default.vue'
 
 export const BackgroundComponent: Component<{ color: Color }> = {

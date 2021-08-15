@@ -1,8 +1,9 @@
-import { State } from '@/store'
 import Color from 'color'
-import { Store } from 'vuex'
-import { Field, Script } from './script'
-import { Layer, LayerType, PropType, Template } from './template'
+import type { Store } from 'vuex'
+import type { State } from '@/store'
+import type { Field, Script } from './script'
+import { LayerType } from './template'
+import type { Layer, PropType, Template } from './template'
 
 export interface File {
   scripts: Script[];

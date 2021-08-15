@@ -49,8 +49,9 @@ import { computed, defineComponent, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useHotkey } from 'vue-use-hotkey'
 import { useStore } from 'vuex'
-import { getSelectedScripts, State } from '@/store'
-import { Field } from '@/common/script'
+import { getSelectedScripts } from '@/store'
+import type { State } from '@/store'
+import type { Field } from '@/common/script'
 
 export default defineComponent({
   setup () {

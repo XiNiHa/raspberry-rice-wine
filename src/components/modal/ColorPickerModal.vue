@@ -39,7 +39,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref } from 'vue'
 import { useStore } from 'vuex'
-import { State } from '@/store'
+import type { State } from '@/store'
 
 export default defineComponent({
   setup () {

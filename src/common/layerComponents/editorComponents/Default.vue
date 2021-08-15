@@ -1,10 +1,12 @@
 <script lang="tsx">
-import { defineComponent, PropType as VuePropType } from 'vue'
+import { defineComponent } from 'vue'
+import type { PropType as VuePropType } from 'vue'
 import { useStore } from 'vuex'
-import { State } from '@/store'
-import { Component, ComponentProp, LayerType, PropType } from '@/common/template'
 import { useI18n } from 'vue-i18n'
 import Color from 'color'
+import type { State } from '@/store'
+import { LayerType } from '@/common/template'
+import type { Component, ComponentProp, PropType } from '@/common/template'
 
 function getComponent<T extends ComponentProp<T>> (componentName: string): Component<T>['editorComponent'] {
   return defineComponent({

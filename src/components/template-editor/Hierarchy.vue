@@ -2,8 +2,10 @@
 import { computed, defineComponent, reactive } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
-import { Mutations, State } from '@/store'
-import { Layer, LayerType, Template } from '@/common/template'
+import { Mutations } from '@/store'
+import type { State } from '@/store'
+import { LayerType } from '@/common/template'
+import type { Layer, Template } from '@/common/template'
 
 export default defineComponent({
   setup () {

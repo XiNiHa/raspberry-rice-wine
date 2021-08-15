@@ -1,6 +1,6 @@
-import { Store } from 'vuex'
-import { Router } from 'vue-router'
-import { State } from '@/store'
+import type { Store } from 'vuex'
+import type { Router } from 'vue-router'
+import type { State } from '@/store'
 import { openFile, saveFile, saveFileAs } from './file'
 
 type Context = {

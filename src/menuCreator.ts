@@ -1,5 +1,7 @@
-import { BrowserWindow, Menu, MenuItemConstructorOptions } from 'electron'
+import { Menu } from 'electron'
+import type { BrowserWindow, MenuItemConstructorOptions } from 'electron'
 import initI18n from './i18n/electronI18n'
+
 const isMac = process.platform === 'darwin'
 
 export default async function (window: BrowserWindow): Promise<void> {

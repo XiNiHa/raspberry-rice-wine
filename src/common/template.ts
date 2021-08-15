@@ -1,5 +1,5 @@
-import Color from 'color'
-import { Component as VueComponent } from 'vue'
+import type { Component as VueComponent } from 'vue'
+import type Color from 'color'
 import { BackgroundComponent } from './layerComponents/background'
 import { FlexComponent } from './layerComponents/flex'
 import { SizingComponent } from './layerComponents/sizing'

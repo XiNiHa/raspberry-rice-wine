@@ -20,12 +20,12 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onDeactivated, reactive, ref } from 'vue'
+import { computed, defineComponent, nextTick, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
-import { State } from '@/store'
-import Renderer from '../base/Renderer.vue'
 import html2canvas from 'html2canvas'
+import type { State } from '@/store'
+import Renderer from '../base/Renderer.vue'
 
 export default defineComponent({
   components: { Renderer },

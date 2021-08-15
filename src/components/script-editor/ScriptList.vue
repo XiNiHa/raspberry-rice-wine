@@ -33,9 +33,10 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Script } from '@/common/script'
 import { useStore } from 'vuex'
-import { Mutations, State } from '@/store'
+import { Mutations } from '@/store'
+import type { State } from '@/store'
+import type { Script } from '@/common/script'
 
 export default defineComponent({
   emits: ['select', 'add', 'remove', 'drop'],

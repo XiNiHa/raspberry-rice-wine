@@ -14,7 +14,7 @@ import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { State } from '@/store'
+import type { State } from '@/store'
 import toolbarHandler from '@/common/toolbarHandler'
 
 export default defineComponent({

@@ -1,4 +1,4 @@
-import { Script } from './script'
+import type { Script } from './script'
 
 export function loadScript (options: {
     input: string;

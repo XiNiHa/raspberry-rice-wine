@@ -11,7 +11,7 @@
 import { computed, defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
-import { State } from '@/store'
+import type { State } from '@/store'
 import Renderer from '../base/Renderer.vue'
 
 export default defineComponent({

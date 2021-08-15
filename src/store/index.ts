@@ -1,8 +1,8 @@
 import { createStore } from 'vuex'
-import Color from 'color'
-import { File } from '@/common/file'
-import { Script } from '@/common/script'
-import { Layer, Template } from '@/common/template'
+import type Color from 'color'
+import type { File } from '@/common/file'
+import type { Script } from '@/common/script'
+import type { Layer, Template } from '@/common/template'
 
 interface FileEditState {
   fsPath?: string;

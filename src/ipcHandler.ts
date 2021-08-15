@@ -1,5 +1,6 @@
-import { app, BrowserWindow, dialog, FileFilter, ipcMain, IpcMainEvent, IpcRendererEvent, Menu, WebContents } from 'electron'
 import fs from 'fs'
+import { app, dialog, ipcMain, Menu } from 'electron'
+import type { BrowserWindow, FileFilter, IpcMainEvent, IpcRendererEvent, WebContents } from 'electron'
 
 export type IpcRendererArgs = {
   close: void;

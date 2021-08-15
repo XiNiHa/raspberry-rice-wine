@@ -1,9 +1,10 @@
 <script lang="tsx">
 /// <reference types="resize-observer-browser" />
-import { computed, defineComponent, reactive, VNode, watch } from 'vue'
+import { computed, defineComponent, reactive, watch } from 'vue'
+import type { VNode } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { insertBetween } from '../../common/utils'
-import { Tab } from './LayoutTypes'
+import { insertBetween } from '@/common/utils'
+import type { Tab } from './LayoutTypes'
 import Panel from './Panel.vue'
 
 enum EdgeDragType { Row, Column, Both }

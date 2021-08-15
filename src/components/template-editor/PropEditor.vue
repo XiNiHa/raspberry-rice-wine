@@ -5,8 +5,9 @@ import { useStore } from 'vuex'
 import Color from 'color'
 import Mime from 'mime-types'
 import MimeDb from 'mime-db'
-import { State } from '@/store'
-import { ComponentName, LayerComponents, LayerType, PropType } from '@/common/template'
+import type { State } from '@/store'
+import { LayerComponents, LayerType } from '@/common/template'
+import type { ComponentName, PropType } from '@/common/template'
 
 export default defineComponent({
   setup () {

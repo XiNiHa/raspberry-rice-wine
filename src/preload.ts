@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import { IpcRendererArgs, IpcMainArgs, IpcMainHandler, IpcMainChannel, IpcRendererChannel } from './ipcHandler'
+import type { IpcRendererArgs, IpcMainArgs, IpcMainHandler, IpcMainChannel, IpcRendererChannel } from './ipcHandler'
 
 function ipcRendererOn<T extends IpcMainChannel> (channel: T, handler: IpcMainHandler<T>) {
   return ipcRenderer.on(channel, handler)

@@ -24,7 +24,8 @@
 import { computed, defineComponent, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
-import { getSelectedScripts, State } from '@/store'
+import { getSelectedScripts } from '@/store'
+import type { State } from '@/store'
 import { getTextboxes } from '@/common/template'
 
 export default defineComponent({

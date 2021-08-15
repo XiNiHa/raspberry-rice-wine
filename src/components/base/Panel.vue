@@ -40,8 +40,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick, PropType, reactive, watch, computed } from 'vue'
-import { Tab } from './LayoutTypes'
+import { defineComponent, nextTick, reactive, watch, computed } from 'vue'
+import type { PropType } from 'vue'
+import type { Tab } from './LayoutTypes'
 import VNodeRenderer from './VNodeRenderer.vue'
 
 export default defineComponent({
