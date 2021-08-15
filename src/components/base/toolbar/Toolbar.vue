@@ -51,13 +51,12 @@ export default defineComponent({
     const lock = ref(false)
 
     watch(() => active.value, (curr, prev) => {
-      const handler = () => {
-        active.value = -1
-        window.removeEventListener('click', handler)
-      }
-
       if (prev === -1) {
-        window.addEventListener('click', handler)
+        window.addEventListener(
+          'click',
+          () => { active.value = -1 },
+          { once: true }
+        )
       }
     })
 

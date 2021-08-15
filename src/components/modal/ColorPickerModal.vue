@@ -83,14 +83,11 @@ export default defineComponent({
       state.hueMouseDown = false
       state.alphaMouseDown = false
     }
-    const registerMouseUp = () => {
-      const handler = () => {
-        mouseUp()
-        window.removeEventListener('mouseup', handler)
-      }
-
-      window.addEventListener('mouseup', handler)
-    }
+    const registerMouseUp = () => window.addEventListener(
+      'mouseup',
+      () => mouseUp(),
+      { once: true }
+    )
 
     const slMouseDown = () => {
       state.slMouseDown = true

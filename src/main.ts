@@ -13,4 +13,8 @@ declare global {
   interface Window extends BridgeApi {}
 }
 
-createApp(App).use(store).use(router).use(vueI18n).mount('#app')
+createApp(App)
+  .use(store)
+  .use(router)
+  .use(vueI18n)
+  .mount('#app')
