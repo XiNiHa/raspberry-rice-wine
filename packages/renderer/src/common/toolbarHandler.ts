@@ -1,7 +1,8 @@
 import type { Store } from 'vuex'
 import type { Router } from 'vue-router'
 import type { State } from '@/store'
-import { openFile, saveFile, saveFileAs } from './file'
+import { Mutations } from '@/store'
+import { File } from './file'
 
 type Context = {
   router?: Router;
@@ -32,53 +33,61 @@ const handlerMap: HandlerMap = {
   file: {
     newFile: ({ store }) => {
       if (store) {
-        store.state.currentFile = {
-          scripts: [],
-          templates: [],
-          selectedScript: {
-            anchor: null,
-            rest: null
-          },
-          selectedTemplate: null,
-          selectedLayer: null
-        }
+        store.commit(Mutations.NewFile)
       }
     },
-    openFile,
-    saveFile,
-    saveFileAs,
-    importScript: ({ store }) => {
-      window.bridgeApi.fileIo.open({
-        encoding: 'utf8',
-        fileTypes: [{
-          name: 'Text Files',
-          extensions: ['txt']
-        }]
-      }).then(({ data }) => {
-        if (store) {
-          store.state.importText = data
-          store.state.activeModal = 'importScript'
-        }
-      })
+    openFile: async ({ store }) => {
+      if (store) {
+        store.commit(Mutations.OpenFile, { file: await File.fromFileSystem() })
+      }
+    },
+    saveFile: async ({ store }) => {
+      if (store) {
+        await store.state.currentFile.save()
+      }
+    },
+    saveFileAs: async ({ store }) => {
+      if (store) {
+        await store.state.currentFile.saveAs()
+      }
+    },
+    importScript: async ({ store }) => {
+      if (store) {
+        const { data } = await window.bridgeApi.fileIo.open({
+          encoding: 'utf8',
+          fileTypes: [{
+            name: 'Text Files',
+            extensions: ['txt']
+          }]
+        })
+
+        store.commit(Mutations.OpenImportScript, { importText: data })
+      }
     },
     export: ({ store }) => {
       if (store) {
-        store.state.activeModal = 'exportOption'
+        store.commit(Mutations.OpenExportOption)
       }
     }
   },
   view: {
     scriptEditor: ({ router }) => {
-      router?.push('/')
-      window.bridgeApi.shell.notifyNewView('scriptEditor')
+      if (router) {
+        router.push('/')
+        window.bridgeApi.shell.notifyNewView('scriptEditor')
+      }
     },
     templateEditor: ({ router }) => {
-      router?.push('/template-editor')
-      window.bridgeApi.shell.notifyNewView('templateEditor')
+      if (router) {
+        router.push('/template-editor')
+        window.bridgeApi.shell.notifyNewView('templateEditor')
+      }
     },
     settings: ({ router }) => {
-      router?.push('/settings')
-      window.bridgeApi.shell.notifyNewView('settings')
+      if (router) {
+        router.push('/settings')
+        window.bridgeApi.shell.notifyNewView('settings')
+      }
     }
   }
 }

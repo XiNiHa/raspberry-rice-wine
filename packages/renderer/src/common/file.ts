@@ -1,14 +1,7 @@
 import Color from 'color'
-import type { Store } from 'vuex'
-import type { State } from '@/store'
 import type { Field, Script } from './script'
-import { LayerType } from './template'
 import type { Layer, PropType, Template } from './template'
-
-export interface File {
-  scripts: Script[];
-  templates: Template[];
-}
+import { LayerType } from './template'
 
 export type TypedObject = {
   type: 'Color';
@@ -42,48 +35,165 @@ export interface JsonFile {
   }[];
 }
 
-export function openFile ({ store }: {store?: Store<State>}): void {
-  if (store) {
-    window.bridgeApi.fileIo.open({
+interface ScriptSelection {
+  anchor: Script | null;
+  rest: Script[] | null;
+}
+export class File {
+  // eslint-disable-next-line no-useless-constructor
+  constructor (
+    public scripts: Script[] = [],
+    public templates: Template[] = [],
+    public fsPath: string | null = null,
+    public selectedScript: ScriptSelection = { anchor: null, rest: null },
+    public selectedTemplate: Template | null = null,
+    public selectedLayer: Layer | null = null
+  ) {}
+
+  static async fromFileSystem (): Promise<File> {
+    const { data, path } = await window.bridgeApi.fileIo.open({
       encoding: 'utf8',
       fileTypes: [{
         name: 'RRW Project File',
         extensions: ['rrw']
       }]
-    }).then(({ data, path }) => {
-      store.state.currentFile = {
-        ...fromJson(JSON.parse(data)),
-        fsPath: path,
-        selectedScript: {
-          anchor: null,
-          rest: null
-        },
-        selectedTemplate: null,
-        selectedLayer: null
-      }
     })
-  }
-}
 
-export function saveFile ({ store }: {store?: Store<State>}): void {
-  if (store) {
-    if (!store.state.currentFile.fsPath) {
-      return saveFileAs({ store })
+    return File.fromJson(data, path)
+  }
+
+  static fromJson (json: string, fsPath: string | null = null): File {
+    const result: File = new File([], [], fsPath)
+    const parsed: JsonFile = JSON.parse(json)
+
+    for (const template of parsed.templates) {
+      const convertLayer = (layer: JsonLayer): Layer => {
+        const converted: Layer = {
+          type: layer.type,
+          imageSrc: layer.type === LayerType.Image ? layer.imageSrc : undefined,
+          base64Url: layer.type === LayerType.Image ? layer.base64Url : undefined,
+          name: layer.name,
+          children: layer.children?.map(convertLayer),
+          plainStyles: layer.plainStyles
+        }
+        if (layer.props) {
+          const convertedProps: Record<string, Record<string, PropType>> = {}
+          for (const [propKey, propObj] of Object.entries(layer.props)) {
+            if (!propObj) continue
+            convertedProps[propKey] = {}
+
+            for (const [key, value] of Object.entries(propObj)) {
+              if (typeof value === 'object') {
+                if (value.type === 'Color') {
+                  convertedProps[propKey][key] = Color.rgb(value.r, value.g, value.b).alpha(value.a)
+                }
+              } else {
+                convertedProps[propKey][key] = value
+              }
+            }
+          }
+          converted.props = convertedProps
+        }
+
+        return converted
+      }
+      result.templates.push({
+        name: template.name,
+        width: template.width,
+        height: template.height,
+        layers: template.layers.map(convertLayer)
+      })
     }
 
-    const json = toJson(store.state.currentFile)
-    window.bridgeApi.fileIo.save({
-      path: store.state.currentFile.fsPath,
+    for (const script of parsed.scripts) {
+      result.scripts.push({
+        fields: script.fields,
+        template: result.templates.find(template => template.name === script.templateId),
+        mappings: script.mappings
+      })
+    }
+
+    return result
+  }
+
+  toJson (): string {
+    const converted: JsonFile = {
+      scripts: [],
+      templates: []
+    }
+
+    for (const script of this.scripts) {
+      converted.scripts.push({
+        fields: script.fields,
+        templateId: script.template?.name,
+        mappings: script.mappings
+      })
+    }
+
+    for (const template of this.templates) {
+      const convertLayer = (layer: Layer): JsonLayer => {
+        const converted: JsonLayer = {
+          type: layer.type,
+          imageSrc: layer.type === LayerType.Image ? layer.imageSrc : undefined,
+          base64Url: layer.type === LayerType.Image ? layer.base64Url : undefined,
+          name: layer.name,
+          children: layer.children?.map(convertLayer),
+          plainStyles: layer.plainStyles
+        }
+        if (layer.props) {
+          const convertedProps: Record<string, Record<string, Exclude<PropType, Color> | TypedObject>> = {}
+          for (const [propKey, propObj] of Object.entries(layer.props)) {
+            if (!propObj) continue
+            convertedProps[propKey] = {}
+
+            for (const [key, value] of Object.entries(propObj)) {
+              if (typeof value === 'object' && value instanceof Color) {
+                convertedProps[propKey][key] = {
+                  type: 'Color',
+                  r: value.red(),
+                  g: value.green(),
+                  b: value.blue(),
+                  a: value.alpha()
+                }
+              } else {
+                convertedProps[propKey][key] = value
+              }
+            }
+          }
+          converted.props = convertedProps
+        }
+
+        return converted
+      }
+
+      converted.templates.push({
+        name: template.name,
+        width: template.width,
+        height: template.height,
+        layers: template.layers.map(convertLayer)
+      })
+    }
+
+    return JSON.stringify(converted)
+  }
+
+  async save (): Promise<void> {
+    if (!this.fsPath) {
+      return this.saveAs()
+    }
+
+    const json = this.toJson()
+    return window.bridgeApi.fileIo.save({
+      path: this.fsPath,
       encoding: 'utf8',
       data: json
     })
   }
-}
 
-export function saveFileAs ({ store }: {store?: Store<State>}): void {
-  if (store) {
-    const json = toJson(store.state.currentFile)
-    window.bridgeApi.fileIo.saveAs({
+  async saveAs (): Promise<void> {
+    const json = this.toJson()
+
+    const { path } = await window.bridgeApi.fileIo.saveAs({
       encoding: 'utf8',
       data: json,
       defaultPath: 'Project.rrw',
@@ -91,124 +201,8 @@ export function saveFileAs ({ store }: {store?: Store<State>}): void {
         name: 'RRW Project File',
         extensions: ['rrw']
       }]
-    }).then(({ path }) => { store.state.currentFile.fsPath = path })
-  }
-}
-
-function toJson (file: File) {
-  const converted: JsonFile = {
-    scripts: [],
-    templates: []
-  }
-
-  for (const script of file.scripts) {
-    converted.scripts.push({
-      fields: script.fields,
-      templateId: script.template?.name,
-      mappings: script.mappings
     })
+
+    this.fsPath = path
   }
-
-  for (const template of file.templates) {
-    const convertLayer = (layer: Layer): JsonLayer => {
-      const converted: JsonLayer = {
-        type: layer.type,
-        imageSrc: layer.type === LayerType.Image ? layer.imageSrc : undefined,
-        base64Url: layer.type === LayerType.Image ? layer.base64Url : undefined,
-        name: layer.name,
-        children: layer.children?.map(convertLayer),
-        plainStyles: layer.plainStyles
-      }
-      if (layer.props) {
-        const convertedProps: Record<string, Record<string, Exclude<PropType, Color> | TypedObject>> = {}
-        for (const [propKey, propObj] of Object.entries(layer.props)) {
-          if (!propObj) continue
-          convertedProps[propKey] = {}
-
-          for (const [key, value] of Object.entries(propObj)) {
-            if (typeof value === 'object' && value instanceof Color) {
-              convertedProps[propKey][key] = {
-                type: 'Color',
-                r: value.red(),
-                g: value.green(),
-                b: value.blue(),
-                a: value.alpha()
-              }
-            } else {
-              convertedProps[propKey][key] = value
-            }
-          }
-        }
-        converted.props = convertedProps
-      }
-
-      return converted
-    }
-
-    converted.templates.push({
-      name: template.name,
-      width: template.width,
-      height: template.height,
-      layers: template.layers.map(convertLayer)
-    })
-  }
-
-  return JSON.stringify(converted)
-}
-
-function fromJson (json: string) {
-  const result: File = {
-    scripts: [],
-    templates: []
-  }
-  const parsed: JsonFile = JSON.parse(json)
-
-  for (const template of parsed.templates) {
-    const convertLayer = (layer: JsonLayer): Layer => {
-      const converted: Layer = {
-        type: layer.type,
-        imageSrc: layer.type === LayerType.Image ? layer.imageSrc : undefined,
-        base64Url: layer.type === LayerType.Image ? layer.base64Url : undefined,
-        name: layer.name,
-        children: layer.children?.map(convertLayer),
-        plainStyles: layer.plainStyles
-      }
-      if (layer.props) {
-        const convertedProps: Record<string, Record<string, PropType>> = {}
-        for (const [propKey, propObj] of Object.entries(layer.props)) {
-          if (!propObj) continue
-          convertedProps[propKey] = {}
-
-          for (const [key, value] of Object.entries(propObj)) {
-            if (typeof value === 'object') {
-              if (value.type === 'Color') {
-                convertedProps[propKey][key] = Color.rgb(value.r, value.g, value.b).alpha(value.a)
-              }
-            } else {
-              convertedProps[propKey][key] = value
-            }
-          }
-        }
-        converted.props = convertedProps
-      }
-
-      return converted
-    }
-    result.templates.push({
-      name: template.name,
-      width: template.width,
-      height: template.height,
-      layers: template.layers.map(convertLayer)
-    })
-  }
-
-  for (const script of parsed.scripts) {
-    result.scripts.push({
-      fields: script.fields,
-      template: result.templates.find(template => template.name === script.templateId),
-      mappings: script.mappings
-    })
-  }
-
-  return result
 }

@@ -1,30 +1,11 @@
 import { createStore } from 'vuex'
 import type Color from 'color'
-import type { File } from '@/common/file'
+import { File } from '@/common/file'
 import type { Script } from '@/common/script'
 import type { Layer, Template } from '@/common/template'
 
-interface FileEditState {
-  fsPath?: string;
-  selectedScript: {
-    anchor: Script | null;
-    rest: Script[] | null;
-  };
-  selectedTemplate: Template | null;
-  selectedLayer: Layer | null;
-}
-
 const state = {
-  currentFile: {
-    scripts: [],
-    templates: [],
-    selectedScript: {
-      anchor: null,
-      rest: null
-    },
-    selectedTemplate: null,
-    selectedLayer: null
-  } as File & FileEditState,
+  currentFile: new File(),
   hotkeyBinds: {
     scriptEditor: {
       newField: new Set(['Shift', '+'])
@@ -43,14 +24,16 @@ const state = {
 export type State = typeof state
 
 export const enum Mutations {
+  NewFile = 'new-file',
+  OpenFile = 'open-file',
   AddScript = 'add-script',
   RemoveScript = 'remove-script',
   MoveScript = 'move-script',
   SelectScript = 'select-script',
-
   SelectTemplate = 'select-template',
-
-  SelectLayer = 'select-layer'
+  SelectLayer = 'select-layer',
+  OpenImportScript = 'open-import-script',
+  OpenExportOption = 'open-export-option',
 }
 
 export function getSelectedScripts (state: State): Script[] {
@@ -70,6 +53,12 @@ export function getSelectedScripts (state: State): Script[] {
 export default createStore({
   state,
   mutations: {
+    [Mutations.NewFile] (state) {
+      state.currentFile = new File()
+    },
+    [Mutations.OpenFile] (state, payload: { file: File }) {
+      state.currentFile = payload.file
+    },
     [Mutations.AddScript] (state) {
       const from = state.currentFile.scripts[state.currentFile.scripts.length - 1]
       state.currentFile.scripts.push({
@@ -137,6 +126,15 @@ export default createStore({
       // if (state.currentFile.selectedTemplate?.layers.includes(payload.target)) {
       state.currentFile.selectedLayer = payload.target
       // }
+    },
+
+    [Mutations.OpenImportScript] (state, payload: { importText: string }) {
+      state.activeModal = 'importScript'
+      state.importText = payload.importText
+    },
+
+    [Mutations.OpenExportOption] (state) {
+      state.activeModal = 'exportOption'
     }
   },
   actions: {
