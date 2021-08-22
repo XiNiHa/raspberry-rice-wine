@@ -123,7 +123,7 @@ export default defineComponent({
       }
     ])
 
-    return { t, store, selectedScript, overlapFields, addField, removeField, updateName, updateValue }
+    return { selectedScript, overlapFields, addField, removeField, updateName, updateValue }
   }
 })
 </script>

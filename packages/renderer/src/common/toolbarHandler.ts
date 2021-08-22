@@ -1,7 +1,7 @@
 import type { Store } from 'vuex'
 import type { Router } from 'vue-router'
-import type { State } from '@/store'
 import { Mutations } from '@/store'
+import type { State } from '@/store'
 import { File } from './file'
 
 type Context = {

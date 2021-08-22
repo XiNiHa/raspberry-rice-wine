@@ -28,7 +28,7 @@ export default defineComponent({
 
     const currentComponent = computed(() => modalMap.value[store.state.activeModal as keyof typeof modalMap.value])
 
-    return { modalMap, currentComponent }
+    return { currentComponent }
   }
 })
 </script>

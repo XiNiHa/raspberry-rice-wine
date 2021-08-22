@@ -26,7 +26,7 @@ export default defineComponent({
               [boxName, anchor.value?.fields.find(field => field.name === fieldName)?.value])
         )) ?? undefined)
 
-    return { store, anchor, mappings }
+    return { anchor, mappings }
   }
 })
 </script>
