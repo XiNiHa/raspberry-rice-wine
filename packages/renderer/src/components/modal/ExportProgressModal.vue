@@ -63,8 +63,8 @@ export default defineComponent({
           const dataUrl = result.toDataURL('image/png')
           await window.bridgeApi.fileIo.save({
             path: `${store.state.exportData.targetDir}/${store.state.exportData.formatter?.(state.currentIndex + 1)}`,
-            encoding: 'base64url',
-            data: dataUrl
+            encoding: 'base64',
+            data: dataUrl.replace(/^data:image\/png;base64,/, '')
           })
         }
       }
