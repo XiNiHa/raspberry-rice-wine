@@ -3,7 +3,7 @@ import { computed, defineComponent, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
 import Color from 'color'
-import Mime from 'mime-types'
+import Mime from 'mime'
 import MimeDb from 'mime-db'
 import { Mutations } from '@/store'
 import type { State } from '@/store'
@@ -144,7 +144,7 @@ export default defineComponent({
                       }]
                     })
                       .then(({ path, data: base64 }) => {
-                        const type = Mime.lookup(path)
+                        const type = Mime.getType(path)
                         store.commit(Mutations.SetLayerImage, {
                           layerId: localLayer.id,
                           imageSrc: path,
