@@ -49,9 +49,8 @@ import { computed, defineComponent, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useHotkey } from 'vue-use-hotkey'
 import { useStore } from 'vuex'
-import { getSelectedScripts } from '@/store'
+import { getSelectedScripts, Mutations } from '@/store'
 import type { State } from '@/store'
-import type { Field } from '@/common/script'
 
 export default defineComponent({
   setup () {
@@ -91,51 +90,28 @@ export default defineComponent({
       overlapFields.value = newOverlapFields
     }, { immediate: true, deep: true })
 
-    const addField = () => {
-      selectedScript.value
-        .forEach(script => script.fields.push({
-          name: t('scriptEditor.newFieldName'),
-          value: ''
-        }))
-    }
+    const addField = () => store.commit(Mutations.AddField)
 
-    const removeField = (field: { name: string; value?: string }) => {
-      selectedScript.value.forEach(script => {
-        const sameName = script.fields.filter(f => f.name === field.name)[0]
-        const index = (sameName && script.fields.indexOf(sameName)) ?? -1
-        if (index !== -1) {
-          script.fields.splice(index, 1)
-        }
-      })
-    }
+    const removeField = (field: { name: string }) => store.commit(
+      Mutations.RemoveFields,
+      { name: field.name }
+    )
 
     const updateName = (origName: string, e: Event) => {
       const field = overlapFields.value.find(field => field.name === origName)
       if (field) {
-        field.name = (e.target as HTMLInputElement).value
+        const newName = (e.target as HTMLInputElement).value
 
-        selectedScript.value.forEach(script => {
-          const f = script.fields.find(f => f.name === origName)
-
-          if (f) {
-            f.name = field.name
-          }
-        })
+        store.commit(Mutations.UpdateNames, { origName, newName })
       }
     }
 
     const updateValue = (name: string, e: Event) => {
       const field = overlapFields.value.find(field => field.name === name)
       if (field) {
-        field.value = (e.target as HTMLInputElement).value
+        const value = (e.target as HTMLInputElement).value
 
-        selectedScript.value.forEach(script => {
-          const f = script.fields.find(f => f.name === name)
-
-          if (f && field.value) {
-            f.value = field.value
-          }
-        })
+        store.commit(Mutations.UpdateValues, { name, value })
       }
     }
 

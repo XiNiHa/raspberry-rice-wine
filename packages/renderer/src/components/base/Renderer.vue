@@ -52,7 +52,7 @@ export default defineComponent({
           case LayerType.Text:
             return (
               <span style={styleObj} class="inline-block max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap">
-                { props.textboxMappings[layer.name] ?? t('layerPreview.textboxPlaceholder')}
+                { props.textboxMappings[layer.id] ?? t('layerPreview.textboxPlaceholder')}
                 { layer.children?.map(renderLayer) }
               </span>
             )

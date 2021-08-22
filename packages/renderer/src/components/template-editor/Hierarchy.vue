@@ -1,79 +1,54 @@
 <script lang="tsx">
 import { computed, defineComponent, reactive } from 'vue'
 import { useStore } from 'vuex'
-import { useI18n } from 'vue-i18n'
 import { Mutations } from '@/store'
 import type { State } from '@/store'
-import { LayerType } from '@/common/template'
-import type { Layer, Template } from '@/common/template'
+import type { Template, Layer } from '@/common/template'
 
 export default defineComponent({
   setup () {
     const store = useStore<State>()
-    const { t } = useI18n()
 
     const state = reactive({
-      openedItems: [] as (Template | Layer)[],
-      drag: null as Layer | null,
-      dragParent: null as Layer[] | null
+      openedItems: [] as string[],
+      dragId: null as string | null,
+      dragParentId: null as string | null
     })
 
     const templates = computed(() => store.state.currentFile.templates)
     const selectedLayer = computed(() => store.state.currentFile.selectedLayer)
     const selectedTemplate = computed(() => selectedLayer.value ? null : store.state.currentFile.selectedTemplate)
 
-    const selectTemplate = (target: Template) => { store.commit(Mutations.SelectTemplate, { target }) }
-    const selectLayer = (target: Layer) => { store.commit(Mutations.SelectLayer, { target }) }
+    const selectTemplate = (target: Template) => store.commit(Mutations.SelectTemplate, { target })
+    const selectLayer = (target: Layer) => store.commit(Mutations.SelectLayer, { target })
 
-    const toggleOpen = (layer: Template | Layer) => {
-      const index = state.openedItems.indexOf(layer)
+    const toggleOpen = (item: Template | Layer) => {
+      const index = state.openedItems.indexOf(item.id)
 
       if (index === -1) {
-        state.openedItems.push(layer)
+        state.openedItems.push(item.id)
       } else {
         state.openedItems.splice(index, 1)
       }
     }
 
     const add = () => {
-      const newLayer = () => ({
-        name: t('hierarchy.newLayer'),
-        type: LayerType.Layer as const,
-        children: [],
-        props: {},
-        plainStyles: {}
-      })
+      const parent = selectedLayer.value ?? selectedTemplate.value
 
-      if (selectedLayer.value) {
-        if (!selectedLayer.value.children) {
-          selectedLayer.value.children = []
-        }
-        selectedLayer.value.children.push(newLayer())
-        if (!state.openedItems.includes(selectedLayer.value)) {
-          state.openedItems.push(selectedLayer.value)
-        }
-      } else if (selectedTemplate.value) {
-        selectedTemplate.value.layers.push(newLayer())
-        if (!state.openedItems.includes(selectedTemplate.value)) {
-          state.openedItems.push(selectedTemplate.value)
+      if (parent) {
+        store.commit(Mutations.NewLayer, { parentId: parent.id })
+        if (!state.openedItems.includes(parent.id)) {
+          state.openedItems.push(parent.id)
         }
       } else {
-        store.state.currentFile.templates.push({
-          name: t('hierarchy.newTemplate'),
-          layers: [],
-          width: 1920,
-          height: 1080
-        })
+        store.commit(Mutations.NewTemplate)
       }
     }
 
-    const clearSelection = () => {
-      store.state.currentFile.selectedTemplate = null
-      store.state.currentFile.selectedLayer = null
-    }
+    const clearSelection = () => store.commit(Mutations.ClearHierarchySelectons)
 
     return () => {
-      const getToggleButton = (target: Template | Layer) => state.openedItems.includes(target)
+      const getToggleButton = (target: Template | Layer) => state.openedItems.includes(target.id)
         ? <button class="w-6 focus:outline-none" onClick={() => toggleOpen(target)} key="down">
             <i class="fas fa-caret-down" />
           </button>
@@ -81,7 +56,7 @@ export default defineComponent({
             <i class="fas fa-caret-right" />
           </button>
 
-      const getLayerItem = (layer: Layer, parentArr: Layer[], indent = 0) => {
+      const getLayerItem = (layer: Layer, parentId: string, indent = 0) => {
         return (
           <li>
             <div
@@ -90,26 +65,25 @@ export default defineComponent({
               onClick={() => selectLayer(layer)}
               onDragstart={e => {
                 e.stopPropagation()
-                state.drag = layer
-                state.dragParent = parentArr
+                state.dragId = layer.id
+                state.dragParentId = parentId
               }}
               onDragover={e => e.preventDefault()}
               onDrop={e => {
                 e.stopPropagation()
-                if (state.dragParent && state.drag) {
-                  const oldIndex = state.dragParent.indexOf(state.drag)
-                  if (oldIndex !== -1) {
-                    state.dragParent.splice(oldIndex, 1)
+                if (state.dragParentId && state.dragId) {
+                  store.commit(Mutations.MoveLayer, {
+                    originParentId: state.dragParentId,
+                    targetParentId: parentId,
+                    layerId: state.dragId
+                  })
 
-                    if (!layer.children) { layer.children = [] }
-                    layer.children.push(state.drag)
-                    if (!state.openedItems.includes(layer)) {
-                      state.openedItems.push(layer)
-                    }
-
-                    state.drag = null
-                    state.dragParent = null
+                  if (!state.openedItems.includes(layer.id)) {
+                    state.openedItems.push(layer.id)
                   }
+
+                  state.dragId = null
+                  state.dragParentId = null
                 }
               }}>
               <div style={{ width: `${18 * indent}px` }} />
@@ -123,18 +97,20 @@ export default defineComponent({
               </span>
               <button class="float-right px-1 focus:outline-none" onClick={(e) => {
                 e.stopPropagation()
-                const index = parentArr.indexOf(layer)
+                store.commit(Mutations.RemoveLayer, { parentId, layerId: layer.id })
+
+                const index = state.openedItems.indexOf(layer.id)
                 if (index !== -1) {
-                  parentArr.splice(index, 1)
+                  state.openedItems.splice(index, 1)
                 }
               }}>
                 <i class="fas fa-times" />
               </button>
             </div>
             {
-              (layer.children?.length && state.openedItems.includes(layer) && (
+              (layer.children?.length && state.openedItems.includes(layer.id) && (
                 <ol class="w-full">
-                  { layer.children.map((child, _, array) => getLayerItem(child, array, indent + 1)) }
+                  { layer.children.map(child => getLayerItem(child, layer.id, indent + 1)) }
                 </ol>
               )) || undefined
             }
@@ -151,18 +127,19 @@ export default defineComponent({
               onDragover={e => e.preventDefault()}
               onDrop={e => {
                 e.stopPropagation()
-                if (state.dragParent && state.drag) {
-                  const oldIndex = state.dragParent.indexOf(state.drag)
-                  if (oldIndex !== -1) {
-                    state.dragParent.splice(oldIndex, 1)
-                    template.layers.push(state.drag)
-                    if (!state.openedItems.includes(template)) {
-                      state.openedItems.push(template)
-                    }
+                if (state.dragParentId && state.dragId) {
+                  store.commit(Mutations.MoveLayer, {
+                    originParentId: state.dragParentId,
+                    targetParentId: template.id,
+                    layerId: state.dragId
+                  })
 
-                    state.drag = null
-                    state.dragParent = null
+                  if (!state.openedItems.includes(template.id)) {
+                    state.openedItems.push(template.id)
                   }
+
+                  state.dragId = null
+                  state.dragParentId = null
                 }
               }}>
               {
@@ -173,20 +150,27 @@ export default defineComponent({
               <span class="text-gray-200 whitespace-nowrap overflow-hidden overflow-ellipsis flex-grow">
                 { template.name }
               </span>
-              <button class="float-right px-1 focus:outline-none" onClick={(e) => {
-                e.stopPropagation()
-                const index = templates.value?.indexOf(template)
-                if (index !== -1) {
-                  templates.value?.splice(index, 1)
-                }
-              }}>
+              <button
+                class="float-right px-1 focus:outline-none"
+                onClick={(e) => {
+                  e.stopPropagation()
+
+                  const templateId = template.id
+
+                  store.commit(Mutations.RemoveTemplate, { templateId })
+
+                  const index = state.openedItems.indexOf(templateId)
+                  if (index !== -1) {
+                    state.openedItems.splice(index, 1)
+                  }
+                }}>
                 <i class="fas fa-times" />
               </button>
             </div>
             {
-              (state.openedItems.includes(template) && (
+              (state.openedItems.includes(template.id) && (
                 <ol class="w-full">
-                  { template.layers.map(layer => getLayerItem(layer, template.layers, 1)) }
+                  { template.layers.map(layer => getLayerItem(layer, template.id, 1)) }
                 </ol>
               )) || undefined
             }
@@ -195,9 +179,7 @@ export default defineComponent({
       }
 
       return <ol class="w-full h-full flex flex-col">
-        {
-          templates.value.map(getTemplateItem)
-        }
+        {templates.value.map(getTemplateItem)}
         <li class="text-center text-white select-none w-full hover:bg-gray-500" onClick={add}>
           <i class="fas fa-plus" />
         </li>

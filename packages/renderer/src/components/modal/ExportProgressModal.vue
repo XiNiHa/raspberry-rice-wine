@@ -24,6 +24,7 @@ import { computed, defineComponent, nextTick, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
 import html2canvas from 'html2canvas'
+import { Mutations } from '@/store'
 import type { State } from '@/store'
 import Renderer from '../base/Renderer.vue'
 
@@ -44,7 +45,8 @@ export default defineComponent({
     const textboxMappings = computed(() => Object.fromEntries(
       Object.entries(currentScript.value.mappings)
         .map(([fieldName, box]) =>
-          [box, currentScript.value.fields.filter(field => field.name === fieldName)[0].value])))
+          [box, currentScript.value.fields.filter(field => field.name === fieldName)[0].value])
+    ))
     const totalCount = computed(() => store.state.currentFile.scripts.length)
     const progress = computed(() => (state.currentIndex + 1) / totalCount.value * 100)
     const renderAreaStyles = computed(() => ({
@@ -67,7 +69,7 @@ export default defineComponent({
         }
       }
 
-      store.state.activeModal = ''
+      store.commit(Mutations.CloseModal)
     })()
 
     return { t, state, progress, currentTemplate, textboxMappings, renderArea, totalCount, renderAreaStyles }

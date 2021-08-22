@@ -24,7 +24,7 @@
       class="select-none w-full text-center text-sm py-1 text-gray-200 hover:bg-gray-500"
       @dragover.prevent
       @drop.stop="dropAt(scripts.length)"
-      @click="addScript()">
+      @click="newScript()">
       <i class="fas fa-plus" />
     </li>
   </ol>
@@ -50,14 +50,12 @@ export default defineComponent({
       return script.fields.map(field => `${field.name}: ${field.value}`).join(', ') || t('scriptList.emptyScript')
     }
 
-    const addScript = () => { store.commit(Mutations.AddScript) }
-    const removeScript = (script: Script) => { store.commit(Mutations.RemoveScript, { script }) }
-    const selectScript = (target: Script, e: MouseEvent) => {
-      store.commit(Mutations.SelectScript, {
-        target,
-        multiSelect: e.shiftKey
-      })
-    }
+    const newScript = () => store.commit(Mutations.NewScript)
+    const removeScript = (script: Script) => store.commit(Mutations.RemoveScript, { script })
+    const selectScript = (target: Script, e: MouseEvent) => store.commit(
+      Mutations.SelectScript,
+      { target, multiSelect: e.shiftKey }
+    )
 
     const setDrag = (script: Script) => { drag.value = script }
     const dropAt = (index: number) => {
@@ -73,7 +71,7 @@ export default defineComponent({
     const scripts = computed(() => store.state.currentFile.scripts)
     const selectedScript = computed(() => store.state.currentFile.selectedScript)
 
-    return { scripts, selectedScript, formatScript, addScript, removeScript, selectScript, setDrag, dropAt }
+    return { scripts, selectedScript, formatScript, newScript, removeScript, selectScript, setDrag, dropAt }
   }
 })
 </script>

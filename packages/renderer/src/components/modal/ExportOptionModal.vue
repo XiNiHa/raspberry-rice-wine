@@ -43,7 +43,7 @@
     <button class="bg-gray-400 rounded-lg w-48 p-4" @click="triggerExport">
       {{ t('exportOptionModal.export') }}
     </button>
-    <button class="absolute top-0 right-0 mt-4 mr-8 text-xl" @click="store.state.activeModal = ''">
+    <button class="absolute top-0 right-0 mt-4 mr-8 text-xl" @click="closeModal">
       <i class="fas fa-times" />
     </button>
   </div>
@@ -53,6 +53,7 @@
 import { defineComponent, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
+import { Mutations } from '@/store'
 import type { State } from '@/store'
 
 export default defineComponent({
@@ -151,13 +152,16 @@ export default defineComponent({
 
     const triggerExport = () => {
       if (selectedDir.value) {
-        store.state.exportData.targetDir = selectedDir.value
-        store.state.exportData.formatter = getFormatter()
-        store.state.activeModal = 'exportProgress'
+        store.commit(Mutations.TriggerExport, {
+          targetDir: selectedDir.value,
+          formatter: getFormatter()
+        })
       }
     }
 
-    return { t, store, fileInput, formatInput, updateDir, addBadge, selectedDir, badges, getFormatter, triggerExport }
+    const closeModal = () => store.commit(Mutations.CloseModal)
+
+    return { t, store, fileInput, formatInput, updateDir, addBadge, selectedDir, badges, getFormatter, triggerExport, closeModal }
   }
 })
 </script>

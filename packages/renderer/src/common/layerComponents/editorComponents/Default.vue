@@ -5,6 +5,7 @@ import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import Color from 'color'
 import type { State } from '@/store'
+import { Mutations } from '@/store'
 import { LayerType } from '@/common/template'
 import type { Component, ComponentProp, PropType } from '@/common/template'
 
@@ -56,11 +57,7 @@ function getComponent<T extends ComponentProp<T>> (componentName: string): Compo
               <button
                 class="flex-grow h-8 mx-2 rounded border-2 border-gray-600 focus:outline-none"
                 style="background: linear-gradient(45deg, #ccc 25%, transparent 25%),linear-gradient(-45deg, #ccc 25%, transparent 25%),linear-gradient(45deg, transparent 75%, #ccc 75%),linear-gradient(-45deg, transparent 75%, #ccc 75%); background-size: 16px 16px; background-position: 0 0, 0 8px, 8px -8px, -8px 0px;"
-                onClick={() => {
-                  store.state.colorPickerTarget = value
-                  store.state.colorPickerCallback = onInput as (c: Color) => void
-                  store.state.activeModal = 'colorPicker'
-                }}>
+                onClick={() => store.commit(Mutations.OpenColorPicker, { target: value, callback: onInput })}>
                 <div class="w-full h-full" style={{ backgroundColor: value.toString() }} />
               </button>
               )

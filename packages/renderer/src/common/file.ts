@@ -1,7 +1,7 @@
 import Color from 'color'
 import type { Field, Script } from './script'
-import type { Layer, PropType, Template } from './template'
-import { LayerType } from './template'
+import { Layer, LayerType, Template } from './template'
+import type { PropType } from './template'
 
 export type TypedObject = {
   type: 'Color';
@@ -12,6 +12,7 @@ export type TypedObject = {
 }
 
 export interface JsonLayer {
+  id: string;
   type: LayerType;
   imageSrc?: string;
   base64Url?: string;
@@ -28,6 +29,7 @@ export interface JsonFile {
     mappings: Record<string, string>;
   }[];
   templates: {
+    id: string;
     name: string;
     layers: JsonLayer[];
     width: number;
@@ -68,14 +70,16 @@ export class File {
 
     for (const template of parsed.templates) {
       const convertLayer = (layer: JsonLayer): Layer => {
-        const converted: Layer = {
-          type: layer.type,
-          imageSrc: layer.type === LayerType.Image ? layer.imageSrc : undefined,
-          base64Url: layer.type === LayerType.Image ? layer.base64Url : undefined,
-          name: layer.name,
-          children: layer.children?.map(convertLayer),
-          plainStyles: layer.plainStyles
-        }
+        const converted: Layer = new Layer(
+          layer.id,
+          layer.name,
+          layer.type,
+          layer.children?.map(convertLayer) ?? [],
+          {},
+          layer.plainStyles ?? {},
+          layer.type === LayerType.Image ? layer.imageSrc : undefined,
+          layer.type === LayerType.Image ? layer.base64Url : undefined
+        )
         if (layer.props) {
           const convertedProps: Record<string, Record<string, PropType>> = {}
           for (const [propKey, propObj] of Object.entries(layer.props)) {
@@ -97,18 +101,21 @@ export class File {
 
         return converted
       }
-      result.templates.push({
-        name: template.name,
-        width: template.width,
-        height: template.height,
-        layers: template.layers.map(convertLayer)
-      })
+      result.templates.push(
+        new Template(
+          template.id,
+          template.name,
+          template.layers.map(convertLayer),
+          template.width,
+          template.height
+        )
+      )
     }
 
     for (const script of parsed.scripts) {
       result.scripts.push({
         fields: script.fields,
-        template: result.templates.find(template => template.name === script.templateId),
+        template: result.templates.find(template => template.id === script.templateId),
         mappings: script.mappings
       })
     }
@@ -125,7 +132,7 @@ export class File {
     for (const script of this.scripts) {
       converted.scripts.push({
         fields: script.fields,
-        templateId: script.template?.name,
+        templateId: script.template?.id,
         mappings: script.mappings
       })
     }
@@ -133,6 +140,7 @@ export class File {
     for (const template of this.templates) {
       const convertLayer = (layer: Layer): JsonLayer => {
         const converted: JsonLayer = {
+          id: layer.id,
           type: layer.type,
           imageSrc: layer.type === LayerType.Image ? layer.imageSrc : undefined,
           base64Url: layer.type === LayerType.Image ? layer.base64Url : undefined,
@@ -167,6 +175,7 @@ export class File {
       }
 
       converted.templates.push({
+        id: template.id,
         name: template.name,
         width: template.width,
         height: template.height,
@@ -204,5 +213,13 @@ export class File {
     })
 
     this.fsPath = path
+  }
+
+  getContainingTemplate (...id: string[]): Template | null {
+    for (const template of this.templates) {
+      if (id.every(id => template.hasOrIs(id))) return template
+    }
+
+    return null
   }
 }

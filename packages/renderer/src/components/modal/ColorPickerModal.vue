@@ -39,6 +39,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref } from 'vue'
 import { useStore } from 'vuex'
+import { Mutations } from '@/store'
 import type { State } from '@/store'
 
 export default defineComponent({
@@ -55,27 +56,29 @@ export default defineComponent({
       alphaMouseDown: false
     })
 
-    const fullAlpha = computed(() => store.state.colorPickerTarget?.alpha(1))
+    const targetColor = computed(() => store.state.colorPickerData.target)
+
+    const fullAlpha = computed(() => targetColor.value?.alpha(1))
     const hueOnly = computed(() => fullAlpha.value?.saturationv(100).value(100))
 
     const boxStyle = computed(() => ({
       backgroundColor: hueOnly.value?.toString()
     }))
     const slPointerStyle = computed(() => ({
-      left: `${store.state.colorPickerTarget?.saturationv()}%`,
-      top: `${100 - (store.state.colorPickerTarget?.value() ?? 0)}%`,
+      left: `${targetColor.value?.saturationv()}%`,
+      top: `${100 - (targetColor.value?.value() ?? 0)}%`,
       backgroundColor: fullAlpha.value?.toString()
     }))
     const huePointerStyle = computed(() => ({
-      left: `${(store.state.colorPickerTarget?.hue() ?? 0) / 360 * 100}%`,
+      left: `${(targetColor.value?.hue() ?? 0) / 360 * 100}%`,
       backgroundColor: hueOnly.value?.toString()
     }))
     const alphaStyle = computed(() => ({
       background: `linear-gradient(to right, ${fullAlpha.value?.toString()} 0%, rgba(0, 0, 0, 0) 100%)`
     }))
     const alphaPointerStyle = computed(() => ({
-      left: `${(1 - (store.state.colorPickerTarget?.alpha() ?? 0)) * 100}%`,
-      backgroundColor: store.state.colorPickerTarget?.toString()
+      left: `${(1 - (targetColor.value?.alpha() ?? 0)) * 100}%`,
+      backgroundColor: targetColor.value?.toString()
     }))
 
     const mouseUp = () => {
@@ -103,29 +106,40 @@ export default defineComponent({
     }
 
     const mouseMove = (e: MouseEvent) => {
-      if (store.state.colorPickerTarget) {
+      if (targetColor.value) {
         if (state.slMouseDown) {
           const rect = slBox.value?.getBoundingClientRect()
           const localX = e.pageX - (rect?.x ?? 0)
           const localY = e.pageY - (rect?.y ?? 0)
-          store.state.colorPickerTarget = store.state.colorPickerTarget.saturationv(Math.max(0, Math.min(100, localX / (slBox.value?.clientWidth ?? 0) * 100)))
-          store.state.colorPickerTarget = store.state.colorPickerTarget.value(Math.max(0, Math.min(100, (1 - localY / (slBox.value?.clientHeight ?? 0)) * 100)))
+          store.commit(
+            Mutations.UpdateColorPickerTarget,
+            { target: targetColor.value.saturationv(Math.max(0, Math.min(100, localX / (slBox.value?.clientWidth ?? 0) * 100))) }
+          )
+          store.commit(
+            Mutations.UpdateColorPickerTarget,
+            { target: targetColor.value.value(Math.max(0, Math.min(100, (1 - localY / (slBox.value?.clientHeight ?? 0)) * 100))) }
+          )
         } else if (state.hueMouseDown) {
           const localX = e.pageX - (hueSlider.value?.getBoundingClientRect().x ?? 0)
-          store.state.colorPickerTarget = store.state.colorPickerTarget.hue(Math.max(0, Math.min(359.99, localX / (hueSlider.value?.clientWidth ?? 0) * 360)))
+          store.commit(
+            Mutations.UpdateColorPickerTarget,
+            { target: targetColor.value.hue(Math.max(0, Math.min(359.99, localX / (hueSlider.value?.clientWidth ?? 0) * 360))) }
+          )
         } else if (state.alphaMouseDown) {
           const localX = e.pageX - (alphaSlider.value?.getBoundingClientRect().x ?? 0)
-          store.state.colorPickerTarget = store.state.colorPickerTarget.alpha(Math.max(0, Math.min(1, 1 - localX / (alphaSlider.value?.clientWidth ?? 0))))
+          store.commit(
+            Mutations.UpdateColorPickerTarget,
+            { target: targetColor.value.alpha(Math.max(0, Math.min(1, 1 - localX / (alphaSlider.value?.clientWidth ?? 0)))) }
+          )
         }
       }
     }
 
     const close = () => {
-      store.state.activeModal = ''
-      if (store.state.colorPickerTarget) {
-        store.state.colorPickerCallback?.(store.state.colorPickerTarget)
+      if (targetColor.value) {
+        store.state.colorPickerData.callback?.(targetColor.value)
       }
-      store.state.colorPickerTarget = null
+      store.commit(Mutations.CloseModal)
     }
 
     return { slBox, hueSlider, alphaSlider, boxStyle, slPointerStyle, huePointerStyle, alphaStyle, alphaPointerStyle, mouseUp, slMouseDown, hueMouseDown, alphaMouseDown, mouseMove, close }

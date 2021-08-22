@@ -63,6 +63,7 @@
 import { computed, defineComponent, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
+import { Mutations } from '@/store'
 import type { State } from '@/store'
 import { loadScript } from '@/common/loader'
 
@@ -145,14 +146,11 @@ export default defineComponent({
         mappings
       })
 
-      store.state.currentFile?.scripts.push(...scripts)
+      store.commit(Mutations.AddScripts, { scripts })
       closeModal()
     }
 
-    const closeModal = () => {
-      store.state.importText = null
-      store.state.activeModal = ''
-    }
+    const closeModal = () => store.commit(Mutations.CloseModal)
 
     return { t, state, patternInput, importText, fieldsLengthArr, addBadge, importScript, closeModal }
   }
