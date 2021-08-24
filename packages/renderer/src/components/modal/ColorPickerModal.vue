@@ -38,13 +38,12 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref } from 'vue'
-import { useStore } from 'vuex'
-import { Mutations } from '@/store'
-import type { State } from '@/store'
+import { Modals, useModalStore } from '@/stores/modal'
+import type { ModalData } from '@/stores/modal'
 
 export default defineComponent({
   setup () {
-    const store = useStore<State>()
+    const modalStore = useModalStore()
 
     const slBox = ref<HTMLDivElement | null>(null)
     const hueSlider = ref<HTMLDivElement | null>(null)
@@ -56,7 +55,12 @@ export default defineComponent({
       alphaMouseDown: false
     })
 
-    const targetColor = computed(() => store.state.colorPickerData.target)
+    const modalData = computed(() =>
+      modalStore.activeModal === Modals.ColorPicker
+        ? modalStore.data as ModalData<Modals.ColorPicker>
+        : null
+    )
+    const targetColor = computed(() => modalData.value?.target)
 
     const fullAlpha = computed(() => targetColor.value?.alpha(1))
     const hueOnly = computed(() => fullAlpha.value?.saturationv(100).value(100))
@@ -111,24 +115,24 @@ export default defineComponent({
           const rect = slBox.value?.getBoundingClientRect()
           const localX = e.pageX - (rect?.x ?? 0)
           const localY = e.pageY - (rect?.y ?? 0)
-          store.commit(
-            Mutations.UpdateColorPickerTarget,
+          modalStore.updateData(
+            Modals.ColorPicker,
             { target: targetColor.value.saturationv(Math.max(0, Math.min(100, localX / (slBox.value?.clientWidth ?? 0) * 100))) }
           )
-          store.commit(
-            Mutations.UpdateColorPickerTarget,
+          modalStore.updateData(
+            Modals.ColorPicker,
             { target: targetColor.value.value(Math.max(0, Math.min(100, (1 - localY / (slBox.value?.clientHeight ?? 0)) * 100))) }
           )
         } else if (state.hueMouseDown) {
           const localX = e.pageX - (hueSlider.value?.getBoundingClientRect().x ?? 0)
-          store.commit(
-            Mutations.UpdateColorPickerTarget,
+          modalStore.updateData(
+            Modals.ColorPicker,
             { target: targetColor.value.hue(Math.max(0, Math.min(359.99, localX / (hueSlider.value?.clientWidth ?? 0) * 360))) }
           )
         } else if (state.alphaMouseDown) {
           const localX = e.pageX - (alphaSlider.value?.getBoundingClientRect().x ?? 0)
-          store.commit(
-            Mutations.UpdateColorPickerTarget,
+          modalStore.updateData(
+            Modals.ColorPicker,
             { target: targetColor.value.alpha(Math.max(0, Math.min(1, 1 - localX / (alphaSlider.value?.clientWidth ?? 0)))) }
           )
         }
@@ -137,9 +141,9 @@ export default defineComponent({
 
     const close = () => {
       if (targetColor.value) {
-        store.state.colorPickerData.callback?.(targetColor.value)
+        modalData.value?.callback?.(targetColor.value)
       }
-      store.commit(Mutations.CloseModal)
+      modalStore.close()
     }
 
     return { slBox, hueSlider, alphaSlider, boxStyle, slPointerStyle, huePointerStyle, alphaStyle, alphaPointerStyle, mouseUp, slMouseDown, hueMouseDown, alphaMouseDown, mouseMove, close }

@@ -9,11 +9,13 @@ import { Mutations } from '@/store'
 import type { State } from '@/store'
 import { LayerComponents, LayerType } from '@/common/template'
 import type { ComponentName, PropType, ComponentPropType } from '@/common/template'
+import { Modals, useModalStore } from '@/stores/modal'
 
 export default defineComponent({
   setup () {
     const { t } = useI18n()
     const store = useStore<State>()
+    const modalStore = useModalStore()
 
     const layer = computed(() => store.state.currentFile.selectedLayer)
     const template = computed(() => store.state.currentFile.selectedTemplate)
@@ -87,9 +89,9 @@ export default defineComponent({
                 class="flex-grow h-8 mx-2 rounded border-2 border-gray-600 focus:outline-none"
                 style="background: linear-gradient(45deg, #ccc 25%, transparent 25%),linear-gradient(-45deg, #ccc 25%, transparent 25%),linear-gradient(45deg, transparent 75%, #ccc 75%),linear-gradient(-45deg, transparent 75%, #ccc 75%); background-size: 16px 16px; background-position: 0 0, 0 8px, 8px -8px, -8px 0px;"
                 onClick={() => {
-                  store.commit(Mutations.OpenColorPicker, {
+                  modalStore.open(Modals.ColorPicker, {
                     target: value,
-                    callback: onInput
+                    callback: onInput as (v: Color) => void
                   })
                 }}>
                 <div class="w-full h-full" style={{ backgroundColor: value.toString() }} />

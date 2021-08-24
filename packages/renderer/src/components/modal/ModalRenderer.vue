@@ -8,8 +8,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, shallowRef } from 'vue'
-import { useStore } from 'vuex'
-import type { State } from '@/store'
+import { Modals, useModalStore } from '@/stores/modal'
 import ImportScriptModal from './ImportScriptModal.vue'
 import ExportOptionModal from './ExportOptionModal.vue'
 import ExportProgressModal from './ExportProgressModal.vue'
@@ -17,16 +16,16 @@ import ColorPickerModal from './ColorPickerModal.vue'
 
 export default defineComponent({
   setup () {
-    const store = useStore<State>()
+    const modalStore = useModalStore()
 
     const modalMap = shallowRef({
-      importScript: ImportScriptModal,
-      exportOption: ExportOptionModal,
-      exportProgress: ExportProgressModal,
-      colorPicker: ColorPickerModal
+      [Modals.ImportScript]: ImportScriptModal,
+      [Modals.ExportOption]: ExportOptionModal,
+      [Modals.ExportProgress]: ExportProgressModal,
+      [Modals.ColorPicker]: ColorPickerModal
     })
 
-    const currentComponent = computed(() => modalMap.value[store.state.activeModal as keyof typeof modalMap.value])
+    const currentComponent = computed(() => modalStore.activeModal && modalMap.value[modalStore.activeModal])
 
     return { currentComponent }
   }

@@ -24,8 +24,9 @@ import { computed, defineComponent, nextTick, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
 import html2canvas from 'html2canvas'
-import { Mutations } from '@/store'
 import type { State } from '@/store'
+import { useModalStore, Modals } from '@/stores/modal'
+import type { ModalData } from '@/stores/modal'
 import Renderer from '../base/Renderer.vue'
 
 export default defineComponent({
@@ -33,6 +34,7 @@ export default defineComponent({
   setup () {
     const { t } = useI18n()
     const store = useStore<State>()
+    const modalStore = useModalStore()
 
     const state = reactive({
       currentIndex: 0
@@ -53,6 +55,11 @@ export default defineComponent({
       width: currentTemplate.value?.width + 'px',
       height: currentTemplate.value?.height + 'px'
     }))
+    const modalData = computed(() =>
+      modalStore.activeModal === Modals.ExportProgress
+        ? modalStore.data as ModalData<Modals.ExportProgress>
+        : null
+    )
 
     ;(async () => {
       for (; state.currentIndex < totalCount.value; state.currentIndex++) {
@@ -62,14 +69,14 @@ export default defineComponent({
           const result = await html2canvas(renderArea.value, { backgroundColor: null })
           const dataUrl = result.toDataURL('image/png')
           await window.bridgeApi.fileIo.save({
-            path: `${store.state.exportData.targetDir}/${store.state.exportData.formatter?.(state.currentIndex + 1)}`,
+            path: `${modalData.value?.targetDir}/${modalData.value?.formatter?.(state.currentIndex + 1)}`,
             encoding: 'base64',
             data: dataUrl.replace(/^data:image\/png;base64,/, '')
           })
         }
       }
 
-      store.commit(Mutations.CloseModal)
+      modalStore.close()
     })()
 
     return { t, state, progress, currentTemplate, textboxMappings, renderArea, totalCount, renderAreaStyles }

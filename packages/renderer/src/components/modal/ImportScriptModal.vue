@@ -65,12 +65,15 @@ import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
 import { Mutations } from '@/store'
 import type { State } from '@/store'
+import { Modals, useModalStore } from '@/stores/modal'
+import type { ModalData } from '@/stores/modal'
 import { loadScript } from '@/common/loader'
 
 export default defineComponent({
   setup () {
     const { t } = useI18n()
     const store = useStore<State>()
+    const modalStore = useModalStore()
 
     const state = reactive({
       fields: [] as string[]
@@ -78,7 +81,12 @@ export default defineComponent({
 
     const patternInput = ref<HTMLDivElement | null>(null)
 
-    const importText = computed(() => store.state.importText)
+    const modalData = computed(() =>
+      modalStore.activeModal === Modals.ImportScript
+        ? modalStore.data as ModalData<Modals.ImportScript>
+        : null
+    )
+    const importText = computed(() => modalData.value?.importText)
     const fieldsLengthArr = computed(() => Array(state.fields.length).fill(0))
 
     const addBadge = (field: string) => {
@@ -150,7 +158,7 @@ export default defineComponent({
       closeModal()
     }
 
-    const closeModal = () => store.commit(Mutations.CloseModal)
+    const closeModal = () => modalStore.close()
 
     return { t, state, patternInput, importText, fieldsLengthArr, addBadge, importScript, closeModal }
   }

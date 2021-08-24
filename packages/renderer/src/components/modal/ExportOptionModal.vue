@@ -52,14 +52,12 @@
 <script lang="ts">
 import { defineComponent, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useStore } from 'vuex'
-import { Mutations } from '@/store'
-import type { State } from '@/store'
+import { Modals, useModalStore } from '@/stores/modal'
 
 export default defineComponent({
   setup () {
     const { t } = useI18n()
-    const store = useStore<State>()
+    const modalStore = useModalStore()
 
     const fileInput = ref<HTMLInputElement | null>(null)
     const formatInput = ref<HTMLDivElement | null>(null)
@@ -152,16 +150,16 @@ export default defineComponent({
 
     const triggerExport = () => {
       if (selectedDir.value) {
-        store.commit(Mutations.TriggerExport, {
+        modalStore.open(Modals.ExportProgress, {
           targetDir: selectedDir.value,
           formatter: getFormatter()
         })
       }
     }
 
-    const closeModal = () => store.commit(Mutations.CloseModal)
+    const closeModal = () => modalStore.close()
 
-    return { t, store, fileInput, formatInput, updateDir, addBadge, selectedDir, badges, getFormatter, triggerExport, closeModal }
+    return { t, fileInput, formatInput, updateDir, addBadge, selectedDir, badges, triggerExport, closeModal }
   }
 })
 </script>

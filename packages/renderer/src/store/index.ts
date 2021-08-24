@@ -1,5 +1,4 @@
 import { createStore } from 'vuex'
-import type Color from 'color'
 import vueI18n from '@/vueI18n'
 import { File } from '@/common/file'
 import type { Script } from '@/common/script'
@@ -12,17 +11,7 @@ const state = {
     scriptEditor: {
       newField: new Set(['Shift', '+'])
     }
-  },
-  activeModal: '',
-  exportData: {
-    targetDir: '',
-    formatter: null as ((scriptIndex: number) => string) | null
-  },
-  colorPickerData: {
-    target: null as Color | null,
-    callback: null as ((c: Color) => void) | null
-  },
-  importText: null as string | null
+  }
 }
 
 export type State = typeof state
@@ -58,12 +47,6 @@ export const enum Mutations {
   AddLayerComponent = 'add-layer-component',
   UpdateLayerComponentProp = 'update-layer-component-prop',
   UpdateHotkey = 'update-hotkey',
-  OpenImportScript = 'open-import-script',
-  OpenExportOption = 'open-export-option',
-  OpenColorPicker = 'open-color-picker',
-  TriggerExport = 'trigger-export',
-  CloseModal = 'close-modal',
-  UpdateColorPickerTarget = 'update-color-picker-target'
 }
 
 export function getSelectedScripts (state: State): Script[] {
@@ -301,37 +284,6 @@ export default createStore({
         target.clear()
         payload.comb.forEach(key => target.add(key))
       }
-    },
-    [Mutations.OpenImportScript] (state, payload: { importText: string }) {
-      state.activeModal = 'importScript'
-      state.importText = payload.importText
-    },
-    [Mutations.OpenExportOption] (state) {
-      state.activeModal = 'exportOption'
-    },
-    [Mutations.OpenColorPicker] (state, payload: {
-      target: Color;
-      callback?: (c: Color) => void;
-    }) {
-      state.activeModal = 'colorPicker'
-      state.colorPickerData.target = payload.target
-      if (payload.callback) {
-        state.colorPickerData.callback = payload.callback
-      }
-    },
-    [Mutations.UpdateColorPickerTarget] (state, payload: { target: Color }) {
-      state.colorPickerData.target = payload.target
-    },
-    [Mutations.CloseModal] (state) {
-      state.activeModal = ''
-      state.importText = null
-      state.colorPickerData.target = null
-      state.colorPickerData.callback = null
-    },
-    [Mutations.TriggerExport] (state, payload: { targetDir: string, formatter: (scriptIndex: number) => string }) {
-      state.activeModal = 'exportProgress'
-      state.exportData.targetDir = payload.targetDir
-      state.exportData.formatter = payload.formatter
     }
   },
   actions: {

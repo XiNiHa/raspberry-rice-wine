@@ -2,6 +2,7 @@ import type { Store } from 'vuex'
 import type { Router } from 'vue-router'
 import { Mutations } from '@/store'
 import type { State } from '@/store'
+import { Modals, useModalStore } from '@/stores/modal'
 import { File } from './file'
 
 type Context = {
@@ -61,12 +62,14 @@ const handlerMap: HandlerMap = {
           }]
         })
 
-        store.commit(Mutations.OpenImportScript, { importText: data })
+        const modalStore = useModalStore()
+        modalStore.open(Modals.ImportScript, { importText: data })
       }
     },
     export: ({ store }) => {
       if (store) {
-        store.commit(Mutations.OpenExportOption)
+        const modalStore = useModalStore()
+        modalStore.open(Modals.ExportOption, null)
       }
     }
   },
