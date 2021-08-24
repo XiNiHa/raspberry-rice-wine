@@ -46,7 +46,6 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { useHotkey } from 'vue-use-hotkey'
 import { useStore } from 'vuex'
 import { getSelectedScripts, Mutations } from '@/store'
@@ -54,7 +53,6 @@ import type { State } from '@/store'
 
 export default defineComponent({
   setup () {
-    const { t } = useI18n()
     const store = useStore<State>()
 
     const overlapFields = ref<{ name: string; value?: string }[]>([])
