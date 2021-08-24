@@ -6,12 +6,7 @@ import { Template, Layer, LayerComponents, genUniqueId } from '@/common/template
 import type { LayerType, ComponentPropKey, ComponentName, ComponentPropValue, ComponentPropType, PropType } from '@/common/template'
 
 const state = {
-  currentFile: new File(),
-  hotkeyBinds: {
-    scriptEditor: {
-      newField: new Set(['Shift', '+'])
-    }
-  }
+  currentFile: new File()
 }
 
 export type State = typeof state
@@ -45,8 +40,7 @@ export const enum Mutations {
   SetLayerType = 'set-layer-type',
   SetLayerImage = 'set-layer-image',
   AddLayerComponent = 'add-layer-component',
-  UpdateLayerComponentProp = 'update-layer-component-prop',
-  UpdateHotkey = 'update-hotkey',
+  UpdateLayerComponentProp = 'update-layer-component-prop'
 }
 
 export function getSelectedScripts (state: State): Script[] {
@@ -269,20 +263,6 @@ export default createStore({
       if (target) {
         const converted = target as ComponentPropType<N>
         converted[payload.propKey] = payload.value
-      }
-    },
-    [Mutations.UpdateHotkey] (state, payload: { comb: Set<string>, path: string[] }) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let target: any = state.hotkeyBinds
-      for (const part of payload.path) {
-        if (!(part in target)) return
-
-        target = target[part]
-      }
-
-      if (target && typeof target === 'object' && target instanceof Set) {
-        target.clear()
-        payload.comb.forEach(key => target.add(key))
       }
     }
   },

@@ -50,10 +50,12 @@ import { useHotkey } from 'vue-use-hotkey'
 import { useStore } from 'vuex'
 import { getSelectedScripts, Mutations } from '@/store'
 import type { State } from '@/store'
+import { useHotkeyStore } from '@/stores/hotkey'
 
 export default defineComponent({
   setup () {
     const store = useStore<State>()
+    const hotkeyStore = useHotkeyStore()
 
     const overlapFields = ref<{ name: string; value?: string }[]>([])
 
@@ -115,7 +117,7 @@ export default defineComponent({
 
     useHotkey([
       {
-        keys: Array.from(store.state.hotkeyBinds.scriptEditor.newField.values()),
+        keys: Array.from(hotkeyStore.keybinds.scriptEditor.newField.values()),
         exact: true,
         handler: () => addField()
       }

@@ -4,7 +4,7 @@
       {{ t('settings.hotkey') }}
     </h1>
     <ul class="flex flex-col w-full flex-grow my-4 bg-gray-700 overflow-y-auto shadow-inner">
-      <li v-for="(hotkeys, category) in store.state.hotkeyBinds" :key="category" class="flex flex-col mx-4 my-2">
+      <li v-for="(hotkeys, category) in hotkeyStore.keybinds" :key="category" class="flex flex-col mx-4 my-2">
         <h2 class="text-xl mx-1">
           {{ t(`hotkey.${category}.title`) }}
         </h2>
@@ -13,7 +13,7 @@
             <h3 class="w-1/2 px-2">
               {{ t(`hotkey.${category}.${key}`) }}
             </h3>
-            <h3 class="w-1/2 border-l border-gray-500 px-2 select-none" @click="bindKeyComb([category, key])">
+            <h3 class="w-1/2 border-l border-gray-500 px-2 select-none" @click="bindKeyComb(category, key)">
               {{ listening ? t('settings.listening') : getKeyCombText(comb) }}
             </h3>
           </li>
@@ -26,14 +26,13 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useStore } from 'vuex'
-import { Mutations } from '@/store'
-import type { State } from '@/store'
+import { useHotkeyStore } from '@/stores/hotkey'
+import type { HotkeyCategoryId, HotkeyId } from '@/stores/hotkey'
 
 export default defineComponent({
   setup () {
     const { t } = useI18n()
-    const store = useStore<State>()
+    const hotkeyStore = useHotkeyStore()
 
     const listening = ref(false)
 
@@ -41,7 +40,7 @@ export default defineComponent({
       return Array.from(comb.values()).map(s => `"${s}"`).join(' + ')
     }
 
-    const bindKeyComb = async (path: string[]) => {
+    const bindKeyComb = async <T extends HotkeyCategoryId> (category: T, id: HotkeyId<T>) => {
       listening.value = true
 
       const newComb = new Set<string>()
@@ -66,7 +65,7 @@ export default defineComponent({
       listeners.keyup = () => {
         if (listening.value && !completed) {
           cleanup()
-          store.commit(Mutations.UpdateHotkey, { comb: newComb, path })
+          hotkeyStore.updateKeybind(category, id, newComb)
         }
       }
 
@@ -78,7 +77,7 @@ export default defineComponent({
       timeout = setTimeout(cleanup, 5000)
     }
 
-    return { t, store, listening, getKeyCombText, bindKeyComb }
+    return { t, hotkeyStore, listening, getKeyCombText, bindKeyComb }
   }
 })
 </script>
